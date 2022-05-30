@@ -9,7 +9,7 @@ class CommonUtils {
   static final String ANNOUNCEMENT_FOR_STUDENT = "2";
 
   static const int ROW_PER_PAGE = 25;
-  static const String FOLDER_NAME = 'Atmiya';
+  static const String FOLDER_NAME = 'Infinity HR';
   static const int LOGIN_TYPE_FACULTY = 1;
   static const int LOGIN_TYPE_STUDENT = 2;
 

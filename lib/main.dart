@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_hr/splash_screen.dart';
+import 'package:infinity_hr/screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,9 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Infinity HR',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
       ),
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),

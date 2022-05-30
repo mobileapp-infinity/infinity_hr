@@ -1,10 +1,6 @@
-
-
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:infinity_hr/api/api_urls.dart';
 import 'package:infinity_hr/utils/commona_utils.dart';
-
-import 'api_urls.dart';
 
 class DioClient {
   static Dio? dio = null;
