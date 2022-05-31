@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30)),
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 25),
+                  padding: const EdgeInsets.only(left: 25, top: 3),
                   child: TextField(
                     cursorColor: Colors.red,
                     controller: _userIdController,
@@ -125,52 +125,56 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(30)),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20.0, right: 25),
-                  child: TextField(
-                    obscureText: _isObscure.value,
-                    scrollPadding: EdgeInsets.zero,
-                    cursorColor: Colors.red,
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      hintText: "Password",
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                      prefixIcon: Image.asset("assets/images/password.png"),
-                      suffixIcon: Material(
-                        child: Obx(
-                          () => _isObscure.value
-                              ? InkWell(
-                                  borderRadius: BorderRadius.circular(30),
-                                  onTap: () {
-                                    setState(() {
-                                      _isObscure.value = !_isObscure.value;
-                                    });
-                                  },
-                                  child: Image.asset(
-                                    "assets/images/ic_action_passwordoff.png",
-                                    scale: 2.5,
-                                  ))
-                              : InkWell(
-                                  borderRadius: BorderRadius.circular(30),
-                                  onTap: () {
-                                    setState(() {
-                                      _isObscure.value = !_isObscure.value;
-                                    });
-                                  },
-                                  child: Image.asset(
-                                    "assets/images/ic_action_passwordon.png",
-                                    scale: 2.5,
-                                  )),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: TextField(
+                      obscureText: _isObscure.value,
+                      scrollPadding: EdgeInsets.zero,
+                      cursorColor: Colors.red,
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        hintText: "Password",
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        prefixIcon: Image.asset("assets/images/password.png"),
+                        suffixIcon: Material(
+                          color: Colors.white,
+                          child: Obx(
+                            () => _isObscure.value
+                                ? InkWell(
+                                    borderRadius: BorderRadius.circular(30),
+                                    onTap: () {
+                                      setState(() {
+                                        _isObscure.value = !_isObscure.value;
+                                      });
+                                    },
+                                    child: Image.asset(
+                                      "assets/images/ic_action_passwordoff.png",
+                                      scale: 2.5,
+                                    ))
+                                : InkWell(
+                                    borderRadius: BorderRadius.circular(30),
+                                    onTap: () {
+                                      setState(() {
+                                        _isObscure.value = !_isObscure.value;
+                                      });
+                                    },
+                                    child: Image.asset(
+                                      "assets/images/ic_action_passwordon.png",
+                                      scale: 2.5,
+                                    )),
+                          ),
+                        ),
+                        hintStyle: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
                         ),
                       ),
-                      hintStyle: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                      ),
+                      keyboardType: TextInputType.visiblePassword,
                     ),
-                    keyboardType: TextInputType.visiblePassword,
                   ),
                 ),
               ),
