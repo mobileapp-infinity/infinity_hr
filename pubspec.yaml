@@ -87,6 +87,12 @@ flutter:
   assets:
     - assets/images/iipl_logo.svg
     - assets/images/splash.jpg
+    - assets/images/sign_in_bg.png
+    - assets/images/password.png
+    - assets/images/logo.png
+    - assets/images/ic_action_passwordon.png
+    - assets/images/ic_action_passwordoff.png
+    - assets/images/envelop.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

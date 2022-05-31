@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/sign_in_bg.png"),
+            image: AssetImage("assets/images/sign_in_bg.png"),
             fit: BoxFit.cover,
           ),
         ),
@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Image.asset(
                   height: deviceSize.height * 0.18,
                   width: deviceSize.height * 0.18,
-                  "assets/logo.png"),
+                  "assets/images/logo.png"),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 15),
                 child: Text(
@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // errorBorder: InputBorder.none,
                       // focusedBorder: InputBorder.none,
                       // focusedErrorBorder: InputBorder.none,
-                      prefixIcon: Image.asset("assets/envelop.png"),
+                      prefixIcon: Image.asset("assets/images/envelop.png"),
                       hintStyle: const TextStyle(
                         fontSize: 18,
                         color: Colors.grey,
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       errorBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       focusedErrorBorder: InputBorder.none,
-                      prefixIcon: Image.asset("assets/password.png"),
+                      prefixIcon: Image.asset("assets/images/password.png"),
                       suffixIcon: Material(
                         child: Obx(
                           () => _isObscure.value
@@ -149,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     });
                                   },
                                   child: Image.asset(
-                                    "assets/ic_action_passwordoff.png",
+                                    "assets/images/ic_action_passwordoff.png",
                                     scale: 2.5,
                                   ))
                               : InkWell(
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     });
                                   },
                                   child: Image.asset(
-                                    "assets/ic_action_passwordon.png",
+                                    "assets/images/ic_action_passwordon.png",
                                     scale: 2.5,
                                   )),
                         ),
@@ -232,7 +232,10 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await http.get(Uri.parse(
           'http://iipl.iipl.info/ierphr.asmx/LoginCheck?&userName=$username&passWord=$password'));
       if (response.statusCode == 200) {
-        loginCheckModel = LoginCheckModel.fromJson(jsonDecode(response.body));
+        loginCheckModel = (json.decode(response.body) as List)
+            .map((e) => LoginCheckModel.fromJson(e))
+            .toList()
+            .first; //  LoginCheckModel.fromJson(jsonDecode(response.body[0]));
         if (loginCheckModel!.status == 1) {
           setPrefrences(loginCheckModel!);
           Navigator.of(context).pushReplacement(
@@ -240,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
               builder: (context) => const DashboardScreen(),
             ),
           );
-        }else{
+        } else {
           Get.snackbar("oops!", "something went wrong");
         }
       } else {
