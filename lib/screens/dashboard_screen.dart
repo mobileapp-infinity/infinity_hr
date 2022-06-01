@@ -39,6 +39,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+      body: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 16.0,
+          horizontal: 16.0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Leave',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      color: Colors.red,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 16.0,
+                  ),
+                  Container(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('HR'),
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
       drawer: Drawer(
         child: ListView(
           // Important: Remove any padding from the ListView.
