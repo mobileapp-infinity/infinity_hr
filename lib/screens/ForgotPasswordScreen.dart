@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:infinity_hr/screens/forgot_password_model.dart';
+import 'package:infinity_hr/models/forgot_password_model.dart';
+import 'package:infinity_hr/utils/custom_colors.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -64,7 +65,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: TextField(
-                      cursorColor: Colors.red,
+                      cursorColor: CustomColor.colorPrimary,
                       controller: _usernamecontroller,
                       decoration: InputDecoration(
                         hintText: "Enter User Name",

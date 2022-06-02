@@ -5,14 +5,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97e936ad-5c63-4618-9371-286ec1f69815" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/models/get_today_in_out_time_model.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/models/last_in_out_model.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/widgets/my_badge.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/ForgotPasswordScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/ForgotPasswordScreen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screens/dashboard_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/dashboard_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/forgot_password_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/forgot_password_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/login_check_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/login_check_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/login_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/splash_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/splash_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/update_app_screen.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/verion_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/verion_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/utils/custom_colors.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utils/custom_colors.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dart File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -38,7 +58,7 @@
     <property name="dart.analysis.tool.window.force.activate" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="io.flutter.reload.alreadyRun" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/assets" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Vimal_Android" />
     <property name="settings.editor.selected.configurable" value="flutter.settings" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
@@ -47,6 +67,8 @@
       <recent name="C:\Users\INFINITY\StudioProjects\infinity_hr\assets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\INFINITY\StudioProjects\infinity_hr\lib\models" />
+      <recent name="C:\Users\INFINITY\StudioProjects\infinity_hr\lib\widgets" />
       <recent name="C:\Users\INFINITY\StudioProjects\infinity_hr\assets\images" />
       <recent name="C:\Users\INFINITY\StudioProjects\infinity_hr\assets" />
     </key>
@@ -67,5 +89,32 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
     </layout>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/screens/login_screen.dart</url>
+          <line>29</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/screens/login_screen.dart</url>
+          <line>202</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -7,8 +7,9 @@ import 'package:infinity_hr/api/api_urls.dart';
 import 'package:infinity_hr/api/dio_client.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 import 'package:infinity_hr/screens/login_screen.dart';
-import 'package:infinity_hr/screens/verion_model.dart';
+import 'package:infinity_hr/models/verion_model.dart';
 import 'package:infinity_hr/utils/app_dialogs.dart';
+import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/utils/icon_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
+      backgroundColor: CustomColor.colorPrimary,
       textColor: Colors.white,
       fontSize: 16.0,
     );

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomColor {
-  static const colorPrimary = const Color(0xFF252258);
+  static const colorPrimary = Color(0xffE21E23);
+  // static const colorPrimary = const Color(0xFF252258);
   static const colorPrimaryDark = const Color(0x80000000);
   static const colorAccent = const Color(0xFFCEA955);
   static const colorCanvas = const Color(0xFFF3F4F6);
@@ -20,14 +21,10 @@ class CustomColor {
   // static const simmer_color = const Color(0xFFc5cae9);
   // static const color_simmer_highlight_color = const Color(0xFFe8f5e9);
 
-
-
-
-
   static const MaterialColor customAccentColor = MaterialColor(
     _accentPrimaryValue,
     <int, Color>{
-       50: Color(0xFFCEA955),
+      50: Color(0xFFCEA955),
       100: Color(0xFFCEA955),
       200: Color(0xFFCEA955),
       300: Color(0xFFCEA955),
@@ -40,8 +37,4 @@ class CustomColor {
     },
   );
   static const int _accentPrimaryValue = 0xFFCEA955;
-
-
-
-
 }
