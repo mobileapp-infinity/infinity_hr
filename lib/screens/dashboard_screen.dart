@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:infinity_hr/api/api_urls.dart';
+import 'package:infinity_hr/models/Get_Employe_Pending_Approval_model.dart';
 import 'package:infinity_hr/models/get_today_in_out_time_model.dart';
 import 'package:infinity_hr/models/last_in_out_model.dart';
 import 'package:infinity_hr/screens/login_screen.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/utils/navigator_constants.dart';
+import 'package:infinity_hr/widgets/drawer_widget.dart';
 import 'package:infinity_hr/widgets/leave_widgets/grid_widget_for_leave.dart';
 import 'package:infinity_hr/widgets/leave_widgets/last_in_out_widget_for_leave.dart';
 import 'package:infinity_hr/widgets/miss_punch_widgets/grid_widget_for_miss_punch.dart';
@@ -15,6 +17,19 @@ import 'package:infinity_hr/widgets/miss_punch_widgets/last_in_out_for_miss_punc
 import 'package:infinity_hr/widgets/my_badge.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
+enum DashboardMenuEnum {
+  none,
+  leaveViewLeaves,
+  leaveAddLeaves,
+  leaveLeaveBalance,
+  leaveViewCancelLeaves,
+  leaveLeaveApproval,
+  leaveCancelLeaveApproval,
+  missPunchViewMissPunch,
+  missPunchAddMissPunch,
+  missPunchMissPunchApproval,
+}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -29,10 +44,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _empCode = "";
   String _empId = "";
   String _userId = "";
+  RxInt totalpencount = 0.obs;
   List<LastInOutModel>? lastinoutmodel;
   GetTodayInOutTimeModel? getTodayInOutTimeModel;
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final Rx<DashboardMenuEnum> _dashboardMenuEnum =
+      Rx<DashboardMenuEnum>(DashboardMenuEnum.none);
+
+  void onDashboardMenuSelected(DashboardMenuEnum dashboardMenuEnum) {
+    _dashboardMenuEnum.value = dashboardMenuEnum;
+  }
 
   @override
   void initState() {
@@ -42,6 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         getPreferencesAndVersionInfo();
         lastInOutApiCall();
         getTodayInOutTimeApiCall();
+        getEmployePendingApprovals();
       },
     );
     super.initState();
@@ -79,41 +102,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              child: Image.asset(
-                "assets/images/logo.png",
-                fit: BoxFit.cover,
-                scale: 1,
-              ),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.home,
-              ),
-              title: const Text('Log Out'),
-              onTap: () {
-                logOut().then(
-                  (_) => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => LoginScreen())),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.train,
-              ),
-              title: const Text('Page 2'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
+      drawer: DrawerWidget(
+        sharedprefs: sharedPreferences,
       ),
       body: Obx(
         () => _isWhichSelected.value
@@ -155,7 +145,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Text(
                                       "Leave",
                                       style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize:
+                                              _isWhichSelected.value ? 17 : 15,
                                           fontWeight: FontWeight.bold,
                                           color: _isWhichSelected.value == true
                                               ? Colors.white
@@ -205,7 +196,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ],
                     ),
-                    GridViewForLeave(),
+                    Obx(
+                      () => GridViewForLeave(
+                          dashboardMenuEnumParam: _dashboardMenuEnum.value,
+                          onDashboardMenuSelected: onDashboardMenuSelected),
+                    ),
                     const SizedBox(
                       height: 40.0,
                     ),
@@ -286,7 +281,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Text(
                                       "Miss Punch",
                                       style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize:
+                                              _isWhichSelected.value ? 15 : 16,
                                           fontWeight: FontWeight.bold,
                                           color: _isWhichSelected.value == false
                                               ? Colors.white
@@ -300,7 +296,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ],
                     ),
-                    GridViewForMissPunch(),
+                    GridViewForMissPunch(
+                        onDashboardMenuSelected: onDashboardMenuSelected,
+                        dashboardMenuEnumParam: _dashboardMenuEnum.value),
                     const SizedBox(
                       height: 40.0,
                     ),
@@ -316,13 +314,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               height: 45,
               width: 45,
               // margin: EdgeInsets.all(10),
-              child: MyBadge(
-                top: 6,
-                right: 2,
-                value: "10",
-                child: Image.asset(
-                  "assets/images/edt_profile.png",
-                  scale: 2.5,
+              child: Obx(
+                () => MyBadge(
+                  top: 6,
+                  right: 2,
+                  value: totalpencount.toString(),
+                  child: Image.asset(
+                    "assets/images/edt_profile.png",
+                    scale: 2.5,
+                  ),
                 ),
               ),
             ),
@@ -338,10 +338,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             Padding(
               padding: EdgeInsets.only(right: 10),
-              child: Text(
-                NavigatorConstants.APP_VERSION,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              child: Obx(
+                () => Text(
+                  NavigatorConstants.APP_VERSION.value.toString(),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -397,8 +399,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> logOut() async {
-    await sharedPreferences!.clear();
+  void getEmployePendingApprovals() async {
+    try {
+      //http://iipl.iipl.info/ierphr.asmx/Get_Today_in_out_time?&user_id=201
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.BASE_URL}Get_employee_pending_approvals?&user_id=$_userId'));
+      if (response.statusCode == 200) {
+        List<GetEmployePendingApproval> pendingapproval =
+            (json.decode(response.body) as List)
+                .map((e) => GetEmployePendingApproval.fromJson(e))
+                .toList();
+        if (pendingapproval.length > 0) {
+          for (int i = 1; i <= pendingapproval.length; i++) {
+            totalpencount.value =
+                pendingapproval[i - 1].penCount! + totalpencount.value;
+          }
+        } else {
+          totalpencount.value = 0;
+        }
+      } else {
+        throw Exception("Something Went Wrong");
+      }
+    } catch (error) {
+      print(error.toString());
+    }
   }
 
   void getPreferencesAndVersionInfo() async {
@@ -406,6 +430,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _empId = sharedPreferences!.getString('emp_id') ?? "";
     _userId = sharedPreferences!.getString('usrm_id') ?? "";
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    NavigatorConstants.APP_VERSION = packageInfo.version;
+    NavigatorConstants.APP_VERSION.value = packageInfo.version;
   }
 }

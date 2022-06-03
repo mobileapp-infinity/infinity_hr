@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:infinity_hr/screens/dashboard_screen.dart';
 
 class GridViewForMissPunch extends StatefulWidget {
-  const GridViewForMissPunch({Key? key}) : super(key: key);
+  late DashboardMenuEnum dashboardMenuEnum;
+  late Function onDashboardMenuSelected;
+  GridViewForMissPunch({
+    super.key,
+    required DashboardMenuEnum dashboardMenuEnumParam,
+    required Function onDashboardMenuSelected,
+  }) {
+    this.dashboardMenuEnum = dashboardMenuEnumParam;
+    this.onDashboardMenuSelected = onDashboardMenuSelected;
+  }
 
   @override
   State<GridViewForMissPunch> createState() => _GridViewForMissPunchState();
@@ -20,46 +30,104 @@ class _GridViewForMissPunchState extends State<GridViewForMissPunch> {
           mainAxisSpacing: 20),
       padding: const EdgeInsets.all(20),
       children: [
-        Card(
-          elevation: 5,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset("assets/images/view_miss_punch_final_red.png"),
-              Text(
-                textAlign: TextAlign.center,
-                "View Miss Punch",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-            ],
+        InkWell(
+          onTap: () {
+            widget.onDashboardMenuSelected(
+                DashboardMenuEnum.missPunchViewMissPunch);
+          },
+          child: Card(
+            color: widget.dashboardMenuEnum ==
+                    DashboardMenuEnum.missPunchViewMissPunch
+                ? Colors.black87
+                : Colors.white,
+            elevation: 5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Image.asset(widget.dashboardMenuEnum ==
+                        DashboardMenuEnum.missPunchViewMissPunch
+                    ? "assets/images/view_miss_punch_final_white.png"
+                    : "assets/images/view_miss_punch_final_red.png"),
+                Text(
+                  textAlign: TextAlign.center,
+                  "View Miss Punch",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: widget.dashboardMenuEnum ==
+                              DashboardMenuEnum.missPunchViewMissPunch
+                          ? Colors.white
+                          : Colors.black),
+                ),
+              ],
+            ),
           ),
         ),
-        Card(
-          elevation: 5,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset("assets/images/add_miss_punch_final_red.png"),
-              Text(
-                textAlign: TextAlign.center,
-                "Add Miss Punch",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              )
-            ],
+        InkWell(
+          onTap: () {
+            widget.onDashboardMenuSelected(
+                DashboardMenuEnum.missPunchAddMissPunch);
+          },
+          child: Card(
+            elevation: 5,
+            color: widget.dashboardMenuEnum ==
+                    DashboardMenuEnum.missPunchAddMissPunch
+                ? Colors.black87
+                : Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Image.asset(widget.dashboardMenuEnum ==
+                        DashboardMenuEnum.missPunchAddMissPunch
+                    ? "assets/images/add_miss_punch_final_white.png"
+                    : "assets/images/add_miss_punch_final_red.png"),
+                Text(
+                  textAlign: TextAlign.center,
+                  "Add Miss Punch",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: widget.dashboardMenuEnum ==
+                              DashboardMenuEnum.missPunchAddMissPunch
+                          ? Colors.white
+                          : Colors.black),
+                )
+              ],
+            ),
           ),
         ),
-        Card(
-          elevation: 5,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset("assets/images/miss_punch_approve_final_red.png"),
-              Text(
-                textAlign: TextAlign.center,
-                "Miss Punch Approval",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              )
-            ],
+        InkWell(
+          onTap: () {
+            widget.onDashboardMenuSelected(
+                DashboardMenuEnum.missPunchMissPunchApproval);
+          },
+          child: Card(
+            elevation: 5,
+            color: widget.dashboardMenuEnum ==
+                    DashboardMenuEnum.missPunchMissPunchApproval
+                ? Colors.black87
+                : Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Image.asset(widget.dashboardMenuEnum ==
+                        DashboardMenuEnum.missPunchMissPunchApproval
+                    ? "assets/images/miss_punch_approval_final_white.png"
+                    : "assets/images/miss_punch_approve_final_red.png"),
+                Text(
+                  textAlign: TextAlign.center,
+                  "Miss Punch Approval",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: widget.dashboardMenuEnum ==
+                            DashboardMenuEnum.missPunchMissPunchApproval
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ],

@@ -1,5 +1,7 @@
+import 'package:get/get.dart';
+
 class NavigatorConstants {
   static const String APP_UPDATE_TYPE = "AppUpdateType";
   static const bool IS_FORCE_UPDATE = false;
-  static String APP_VERSION = "-";
+  static RxString APP_VERSION = "-".obs;
 }

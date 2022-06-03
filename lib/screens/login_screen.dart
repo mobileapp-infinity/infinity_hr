@@ -229,7 +229,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: CircularProgressIndicator(
                                 color: Colors.white,
                                 strokeWidth: 2.0,
-                              ))
+                              ),
+                            )
                           : const Text("Sign In"),
                     ),
                   ),
