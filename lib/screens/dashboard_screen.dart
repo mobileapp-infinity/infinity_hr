@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -8,8 +7,14 @@ import 'package:infinity_hr/models/get_today_in_out_time_model.dart';
 import 'package:infinity_hr/models/last_in_out_model.dart';
 import 'package:infinity_hr/screens/login_screen.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
+import 'package:infinity_hr/utils/navigator_constants.dart';
+import 'package:infinity_hr/widgets/leave_widgets/grid_widget_for_leave.dart';
+import 'package:infinity_hr/widgets/leave_widgets/last_in_out_widget_for_leave.dart';
+import 'package:infinity_hr/widgets/miss_punch_widgets/grid_widget_for_miss_punch.dart';
+import 'package:infinity_hr/widgets/miss_punch_widgets/last_in_out_for_miss_punch.dart';
 import 'package:infinity_hr/widgets/my_badge.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -20,10 +25,11 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final RxBool _isWhichSelected = true.obs;
+  final RxBool _isLastInOutAvailbale = false.obs;
   String _empCode = "";
   String _empId = "";
   String _userId = "";
-  LastInOutModel? lastInOutModel;
+  List<LastInOutModel>? lastinoutmodel;
   GetTodayInOutTimeModel? getTodayInOutTimeModel;
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -33,7 +39,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _prefs.then(
       (prefeInstance) {
         sharedPreferences = prefeInstance;
-        getPreferences();
+        getPreferencesAndVersionInfo();
         lastInOutApiCall();
         getTodayInOutTimeApiCall();
       },
@@ -73,55 +79,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 16.0,
-          horizontal: 16.0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Leave',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.0),
-                      color: Colors.red,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 16.0,
-                  ),
-                  Container(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('HR'),
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.0),
-                      color: Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
       drawer: Drawer(
         child: ListView(
           // Important: Remove any padding from the ListView.
@@ -158,203 +115,200 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  child: GestureDetector(
-                    onTap: () {
-                      _isWhichSelected.value = true;
-                    },
-                    child: SizedBox(
-                      height: deviceSize.height * 0.08,
-                      width: deviceSize.width * 0.40,
-                      child: Obx(
-                        () => Card(
-                          color: _isWhichSelected.value
-                              ? CustomColor.colorPrimary
-                              : Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(13),
-                            ),
-                          ),
-                          elevation: 0,
-                          child: Center(
-                            child: Text(
-                              "Leave",
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: _isWhichSelected.value == true
-                                      ? Colors.white
-                                      : Colors.black54),
+      body: Obx(
+        () => _isWhichSelected.value
+            ? SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_isLastInOutAvailbale.value)
+                      Padding(
+                        padding: EdgeInsets.only(top: 10, right: 10, left: 10),
+                        child: LastInLastOutForLeave(
+                            lastinoutmodel: lastinoutmodel),
+                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          child: GestureDetector(
+                            onTap: () {
+                              _isWhichSelected.value = true;
+                            },
+                            child: SizedBox(
+                              height: deviceSize.height * 0.08,
+                              width: deviceSize.width * 0.40,
+                              child: Obx(
+                                () => Card(
+                                  color: _isWhichSelected.value
+                                      ? CustomColor.colorPrimary
+                                      : Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(13),
+                                    ),
+                                  ),
+                                  elevation: 0,
+                                  child: Center(
+                                    child: Text(
+                                      "Leave",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: _isWhichSelected.value == true
+                                              ? Colors.white
+                                              : Colors.black),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  child: GestureDetector(
-                    onTap: () {
-                      _isWhichSelected.value = false;
-                    },
-                    child: SizedBox(
-                      height: deviceSize.height * 0.08,
-                      width: deviceSize.width * 0.40,
-                      child: Obx(
-                        () => Card(
-                          color: _isWhichSelected.value == false
-                              ? CustomColor.colorPrimary
-                              : Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(13),
-                            ),
-                          ),
-                          elevation: 0,
-                          child: Center(
-                            child: Text(
-                              "Miss Punch",
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          child: GestureDetector(
+                            onTap: () {
+                              _isWhichSelected.value = false;
+                            },
+                            child: SizedBox(
+                              height: deviceSize.height * 0.08,
+                              width: deviceSize.width * 0.40,
+                              child: Obx(
+                                () => Card(
                                   color: _isWhichSelected.value == false
-                                      ? Colors.white
-                                      : Colors.black54),
+                                      ? CustomColor.colorPrimary
+                                      : Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(13),
+                                    ),
+                                  ),
+                                  elevation: 0,
+                                  child: Center(
+                                    child: Text(
+                                      "Miss Punch",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: _isWhichSelected.value == false
+                                              ? Colors.white
+                                              : Colors.black),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
+                    GridViewForLeave(),
+                    const SizedBox(
+                      height: 40.0,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            GridView(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisExtent: 160,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20),
-              padding: const EdgeInsets.all(20),
-              children: [
-                Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset("assets/images/view_leave_final_red.png"),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "View Leaves",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_isLastInOutAvailbale.value)
+                      Padding(
+                        padding: EdgeInsets.only(top: 10, right: 10, left: 10),
+                        child: LastInOutForMissPunch(
+                            lastinoutmodel: lastinoutmodel),
                       ),
-                    ],
-                  ),
-                ),
-                Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset("assets/images/add_leave_final_red.png"),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "Add Leave",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      )
-                    ],
-                  ),
-                ),
-                Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset("assets/images/leave_balance_final_red.png"),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "Leave Balance",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      )
-                    ],
-                  ),
-                ),
-                Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset(
-                          "assets/images/view_cancel_leave_final_red.png"),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "View Cancel Leaves",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      )
-                    ],
-                  ),
-                ),
-                Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset("assets/images/leave_approval_final_red.png"),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "Leave Approval",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      )
-                    ],
-                  ),
-                ),
-                Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset(
-                          "assets/images/cancel_leave_approval_final_red.png"),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "Cancel Leave Approval",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          child: GestureDetector(
+                            onTap: () {
+                              _isWhichSelected.value = true;
+                            },
+                            child: SizedBox(
+                              height: deviceSize.height * 0.08,
+                              width: deviceSize.width * 0.40,
+                              child: Obx(
+                                () => Card(
+                                  color: _isWhichSelected.value
+                                      ? CustomColor.colorPrimary
+                                      : Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(13),
+                                    ),
+                                  ),
+                                  elevation: 0,
+                                  child: Center(
+                                    child: Text(
+                                      "Leave",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: _isWhichSelected.value == true
+                                              ? Colors.white
+                                              : Colors.black),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                      )
-                    ],
-                  ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          child: GestureDetector(
+                            onTap: () {
+                              _isWhichSelected.value = false;
+                            },
+                            child: SizedBox(
+                              height: deviceSize.height * 0.08,
+                              width: deviceSize.width * 0.40,
+                              child: Obx(
+                                () => Card(
+                                  color: _isWhichSelected.value == false
+                                      ? CustomColor.colorPrimary
+                                      : Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(13),
+                                    ),
+                                  ),
+                                  elevation: 0,
+                                  child: Center(
+                                    child: Text(
+                                      "Miss Punch",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: _isWhichSelected.value == false
+                                              ? Colors.white
+                                              : Colors.black54),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    GridViewForMissPunch(),
+                    const SizedBox(
+                      height: 40.0,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
       ),
-      bottomSheet:
-          // Padding(
-          //   padding:
-          //       EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          //   child:
-          Container(
+      bottomSheet: Container(
         color: CustomColor.colorPrimary,
         child: Row(
           children: [
@@ -372,31 +326,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Text(
-              "Employe Code: $_empCode",
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.white),
-            )
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text(
+                  "Employe Code: $_empCode",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Text(
+                NavigatorConstants.APP_VERSION,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  lastInOutApiCall() async {
+  void lastInOutApiCall() async {
     try {
       final response = await http.get(
           Uri.parse('${ApiUrls.BASE_URL}Get_Dashboard_detail?&emp_id=$_empId'));
       if (response.statusCode == 200) {
-        List<LastInOutModel> lastinoutmodel = (json.decode(response.body)
-                as List)
+        lastinoutmodel = (json.decode(response.body) as List)
             .map((e) => LastInOutModel.fromJson(e))
             .toList(); //  LoginCheckModel.fromJson(jsonDecode(response.body[0]));
-
-        print("last in${lastinoutmodel[0].lastIn}");
-        print("last out${lastinoutmodel[0].lastOut}");
-        print("is parent${lastinoutmodel[0].isParent}");
-        print("coffIsDisplay${lastinoutmodel[0].coffIsDisplay}");
+        if (lastinoutmodel != null) {
+          if (lastinoutmodel!.length == 0) {
+            lastinoutmodel = [];
+          } else {
+            _isLastInOutAvailbale.value = true;
+          }
+        } else {
+          _isLastInOutAvailbale.value = false;
+        }
       } else {
         // Get.snackbar("oops!", "something went wrong");
         throw Exception("Something Went Wrong");
@@ -406,7 +376,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  getTodayInOutTimeApiCall() async {
+  void getTodayInOutTimeApiCall() async {
     try {
       //http://iipl.iipl.info/ierphr.asmx/Get_Today_in_out_time?&user_id=201
       final response = await http.get(Uri.parse(
@@ -431,9 +401,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     await sharedPreferences!.clear();
   }
 
-  getPreferences() {
+  void getPreferencesAndVersionInfo() async {
     _empCode = sharedPreferences!.getString('emp_code') ?? "";
     _empId = sharedPreferences!.getString('emp_id') ?? "";
     _userId = sharedPreferences!.getString('usrm_id') ?? "";
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    NavigatorConstants.APP_VERSION = packageInfo.version;
   }
 }

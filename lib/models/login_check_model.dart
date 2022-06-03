@@ -190,32 +190,4 @@ class LoginCheckModel {
     _mobileno = json['mobileno'];
     _joiningDate = json['joining_date'];
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this._status;
-    data['usrm_id'] = this._usrmId;
-    data['emp_code'] = this._empCode;
-    data['usrm_name'] = this._usrmName;
-    data['usrm_dis_name'] = this._usrmDisName;
-    data['FullName'] = this._fullName;
-    data['comp_id'] = this._compId;
-    data['usrm_brm_id'] = this._usrmBrmId;
-    data['com_name'] = this._comName;
-    data['Branch'] = this._branch;
-    data['Department'] = this._department;
-    data['Designation'] = this._designation;
-    data['fin_year'] = this._finYear;
-    data['fin_id'] = this._finId;
-    data['fin_start_date'] = this._finStartDate;
-    data['fin_end_date'] = this._finEndDate;
-    data['emp_id'] = this._empId;
-    data['Reportingto'] = this._reportingto;
-    data['userphoto'] = this._userphoto;
-    data['Personal_email'] = this._personalEmail;
-    data['office_email'] = this._officeEmail;
-    data['mobileno'] = this._mobileno;
-    data['joining_date'] = this._joiningDate;
-    return data;
-  }
 }

@@ -20,11 +20,4 @@ class GetTodayInOutTimeModel {
     _intime = json['intime'] ?? "-";
     _outtime = json['outtime'] ?? "-";
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['intime'] = this._intime;
-    data['outtime'] = this._outtime;
-    return data;
-  }
 }

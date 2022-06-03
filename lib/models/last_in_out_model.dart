@@ -46,14 +46,4 @@ class LastInOutModel {
     _isParent = json['IsParent'];
     _coffIsDisplay = json['coff_is_display'];
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['LastDate'] = this._lastDate;
-    data['Last_in'] = this._lastIn;
-    data['Last_Out'] = this._lastOut;
-    data['IsParent'] = this._isParent;
-    data['coff_is_display'] = this._coffIsDisplay;
-    return data;
-  }
 }

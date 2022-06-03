@@ -6,9 +6,9 @@ class version {
 
   version(
       {int? isForceUpdate,
-        String? appVersion,
-        int? isAppSpecial,
-        String? apkUrl}) {
+      String? appVersion,
+      int? isAppSpecial,
+      String? apkUrl}) {
     if (isForceUpdate != null) {
       this._isForceUpdate = isForceUpdate;
     }
@@ -37,14 +37,5 @@ class version {
     _appVersion = json['app_version'];
     _isAppSpecial = json['is_app_special'];
     _apkUrl = json['apk_url'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['is_force_update'] = this._isForceUpdate;
-    data['app_version'] = this._appVersion;
-    data['is_app_special'] = this._isAppSpecial;
-    data['apk_url'] = this._apkUrl;
-    return data;
   }
 }
