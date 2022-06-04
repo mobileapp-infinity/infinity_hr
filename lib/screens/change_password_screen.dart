@@ -26,7 +26,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   ChangePasswordModel? changePasswordModel;
   String? userId = "-";
-  final RxBool _isObscure = true.obs;
+  final RxBool _isObscureForOld = true.obs;
+  final RxBool _isObscureForNew = true.obs;
+  final RxBool _isObscureForConfirm = true.obs;
 
   @override
   void initState() {
@@ -50,10 +52,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                    height: deviceSize.height * 0.18,
-                    width: deviceSize.height * 0.18,
-                    "assets/images/logo.png"),
+                // Image.asset(
+                //     height: deviceSize.height * 0.18,
+                //     width: deviceSize.height * 0.18,
+                //     "assets/images/logo.png"),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 15),
                   child: Text(
@@ -88,7 +90,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(5),
                       child: TextField(
-                        obscureText: false,
+                        obscureText: _isObscureForOld.value,
                         scrollPadding: EdgeInsets.zero,
                         cursorColor: CustomColor.colorPrimary,
                         controller: _oldPasswordController,
@@ -99,16 +101,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           errorBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           focusedErrorBorder: InputBorder.none,
-                          prefixIcon: Image.asset("assets/images/password.png"),
+                          prefixIcon:
+                              Image.asset("assets/images/change_psw_black.png"),
                           suffixIcon: Material(
                             color: Colors.white,
                             child: Obx(
-                              () => _isObscure.value
+                              () => _isObscureForOld.value
                                   ? InkWell(
                                       borderRadius: BorderRadius.circular(30),
                                       onTap: () {
                                         setState(() {
-                                          _isObscure.value = !_isObscure.value;
+                                          _isObscureForOld.value =
+                                              !_isObscureForOld.value;
                                         });
                                       },
                                       child: Image.asset(
@@ -119,7 +123,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                       borderRadius: BorderRadius.circular(30),
                                       onTap: () {
                                         setState(() {
-                                          _isObscure.value = !_isObscure.value;
+                                          _isObscureForOld.value =
+                                              !_isObscureForOld.value;
                                         });
                                       },
                                       child: Image.asset(
@@ -163,7 +168,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(5),
                       child: TextField(
-                        obscureText: false,
+                        obscureText: _isObscureForNew.value,
                         scrollPadding: EdgeInsets.zero,
                         cursorColor: CustomColor.colorPrimary,
                         controller: _newPasswordController,
@@ -174,16 +179,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           errorBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           focusedErrorBorder: InputBorder.none,
-                          prefixIcon: Image.asset("assets/images/password.png"),
+                          prefixIcon:
+                              Image.asset("assets/images/change_psw_black.png"),
                           suffixIcon: Material(
                             color: Colors.white,
                             child: Obx(
-                              () => _isObscure.value
+                              () => _isObscureForNew.value
                                   ? InkWell(
                                       borderRadius: BorderRadius.circular(30),
                                       onTap: () {
                                         setState(() {
-                                          _isObscure.value = !_isObscure.value;
+                                          _isObscureForNew.value =
+                                              !_isObscureForNew.value;
                                         });
                                       },
                                       child: Image.asset(
@@ -194,7 +201,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                       borderRadius: BorderRadius.circular(30),
                                       onTap: () {
                                         setState(() {
-                                          _isObscure.value = !_isObscure.value;
+                                          _isObscureForNew.value =
+                                              !_isObscureForNew.value;
                                         });
                                       },
                                       child: Image.asset(
@@ -238,7 +246,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(5),
                       child: TextField(
-                        obscureText: false,
+                        obscureText: _isObscureForConfirm.value,
                         scrollPadding: EdgeInsets.zero,
                         cursorColor: CustomColor.colorPrimary,
                         controller: _cinfirmPasswordController,
@@ -249,16 +257,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           errorBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           focusedErrorBorder: InputBorder.none,
-                          prefixIcon: Image.asset("assets/images/password.png"),
+                          prefixIcon:
+                              Image.asset("assets/images/change_psw_black.png"),
                           suffixIcon: Material(
                             color: Colors.white,
                             child: Obx(
-                              () => _isObscure.value
+                              () => _isObscureForConfirm.value
                                   ? InkWell(
                                       borderRadius: BorderRadius.circular(30),
                                       onTap: () {
                                         setState(() {
-                                          _isObscure.value = !_isObscure.value;
+                                          _isObscureForConfirm.value =
+                                              !_isObscureForConfirm.value;
                                         });
                                       },
                                       child: Image.asset(
@@ -269,7 +279,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                       borderRadius: BorderRadius.circular(30),
                                       onTap: () {
                                         setState(() {
-                                          _isObscure.value = !_isObscure.value;
+                                          _isObscureForConfirm.value =
+                                              !_isObscureForConfirm.value;
                                         });
                                       },
                                       child: Image.asset(
@@ -306,23 +317,28 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       _isLoading.value = true;
                       if (_oldPasswordController.text == "") {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content:
-                                    const Text("please enter oldpassword")));
+                          const SnackBar(
+                            content: Text("please enter old password"),
+                          ),
+                        );
                         _isLoading.value = false;
                         return;
                       }
                       if (_newPasswordController.text == "") {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("please enter newpassword")));
+                          const SnackBar(
+                            content: Text("please enter new password"),
+                          ),
+                        );
                         _isLoading.value = false;
                         return;
                       }
                       if (_cinfirmPasswordController.text == "") {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("please enter confirmpassword")));
+                          const SnackBar(
+                            content: Text("please enter confirm password"),
+                          ),
+                        );
                         _isLoading.value = false;
                         return;
                       }
@@ -333,8 +349,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 _cinfirmPasswordController.text
                                     .trim()
                                     .toString())
-                            .then((message) =>
-                                Fluttertoast.showToast(msg: message!));
+                            .then((message) {
+                          Fluttertoast.showToast(msg: message!);
+                          if (message == "Password Changed") {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          }
+                        });
                       } else {
                         Fluttertoast.showToast(
                             msg:
@@ -368,8 +389,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     // http://iipl.iipl.info/ierphr.asmx/Employee_Change_password?&user_id=294&ip=1&oldPassword=Welcome_IIPL&newPassword=Welcome_IIPL
     userId = sharedPreferences!.getString("usrm_id");
     try {
+      Future.delayed(
+        Duration(seconds: 10),
+      );
       final response = await http.get(Uri.parse(
-          '${ApiUrls.BASE_URL}Employee_Change_password?&user_id=$userId&oldPassword=$oldpass&newPassword=$newpass'));
+          '${ApiUrls.BASE_URL}Employee_Change_password?&user_id=$userId&ip=1&oldPassword=$oldpass&newPassword=$newpass'));
       print(userId);
       if (response.statusCode == 200) {
         changePasswordModel = (json.decode(response.body) as List)
@@ -377,19 +401,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             .toList()
             .first;
         return changePasswordModel!.msg.toString();
-
-        //  LoginCheckModel.fromJson(jsonDecode(response.body[0]));
-        // if (loginCheckModel!.status == 1) {
-        //   setPrefrences(loginCheckModel!);
-        //   Navigator.of(context).pushReplacement(
-        //     MaterialPageRoute(
-        //       builder: (context) => const DashboardScreen(),
-        //     ),
-        //   );
-        // }
-        // else {
-        //     Fluttertoast.showToast(msg: "User Not Found!");
-        //   }
       } else {
         return "something Went Wrong please try again later";
       }

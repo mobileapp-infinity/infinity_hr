@@ -143,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   elevation: 0,
                                   child: Center(
                                     child: Text(
-                                      "Leave",
+                                      "Add Leave",
                                       style: TextStyle(
                                           fontSize:
                                               _isWhichSelected.value ? 17 : 15,
