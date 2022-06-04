@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:infinity_hr/api/api_urls.dart';
@@ -18,10 +18,11 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  RxBool _isLoading = false.obs;
-  TextEditingController _oldPasswordController = TextEditingController();
-  TextEditingController _newPasswordController = TextEditingController();
-  TextEditingController _cinfirmPasswordController = TextEditingController();
+  final RxBool _isLoading = false.obs;
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   SharedPreferences? sharedPreferences;
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   ChangePasswordModel? changePasswordModel;
@@ -40,6 +41,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     var deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: GestureDetector(
+          onTap: (){
+            Navigator.of(context).pop();
+          },
+            child: Image.asset("assets/images/ic_back_final.png",color: Colors.black,scale: 3.5,)),
+        title:const Text("Change Password",style: TextStyle(color: Colors.black),),
+        elevation: 0,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -249,7 +260,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         obscureText: _isObscureForConfirm.value,
                         scrollPadding: EdgeInsets.zero,
                         cursorColor: CustomColor.colorPrimary,
-                        controller: _cinfirmPasswordController,
+                        controller: _confirmPasswordController,
                         decoration: InputDecoration(
                           hintText: "Enter Confirm Password",
                           border: InputBorder.none,
@@ -333,7 +344,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         _isLoading.value = false;
                         return;
                       }
-                      if (_cinfirmPasswordController.text == "") {
+                      if (_confirmPasswordController.text == "") {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("please enter confirm password"),
@@ -343,10 +354,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         return;
                       }
                       if (_newPasswordController.text.trim() ==
-                          _cinfirmPasswordController.text.trim()) {
+                          _confirmPasswordController.text.trim()) {
                         changePasswordApiCall(
                                 _oldPasswordController.text.trim().toString(),
-                                _cinfirmPasswordController.text
+                                _confirmPasswordController.text
                                     .trim()
                                     .toString())
                             .then((message) {
@@ -359,13 +370,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       } else {
                         Fluttertoast.showToast(
                             msg:
-                                "new password and cinfirm password are not same!");
+                                "new password and confirm password are not same!");
                       }
                       _isLoading.value = false;
                     },
                     child: Obx(
                       () => _isLoading.value
-                          ? SizedBox(
+                          ? const SizedBox(
                               height: 15,
                               width: 15,
                               child: CircularProgressIndicator(
@@ -385,16 +396,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
-  Future<String?> changePasswordApiCall(oldpass, newpass) async {
+  Future<String?> changePasswordApiCall(oldPassword, newPassword) async {
     // http://iipl.iipl.info/ierphr.asmx/Employee_Change_password?&user_id=294&ip=1&oldPassword=Welcome_IIPL&newPassword=Welcome_IIPL
     userId = sharedPreferences!.getString("usrm_id");
     try {
-      Future.delayed(
-        Duration(seconds: 10),
+      await Future.delayed(
+        const Duration(seconds: 10),
       );
       final response = await http.get(Uri.parse(
-          '${ApiUrls.BASE_URL}Employee_Change_password?&user_id=$userId&ip=1&oldPassword=$oldpass&newPassword=$newpass'));
-      print(userId);
+          '${ApiUrls.baseUrl}Employee_Change_password?&user_id=$userId&ip=1&oldPassword=$oldPassword&newPassword=$newPassword'));
+      if (kDebugMode) {
+        print(userId);
+      }
       if (response.statusCode == 200) {
         changePasswordModel = (json.decode(response.body) as List)
             .map((e) => ChangePasswordModel.fromJson(e))
@@ -406,7 +419,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       }
     } catch (error) {
       Fluttertoast.showToast(msg: error.toString());
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
     }
     return null;
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 
 class GridViewForLeave extends StatefulWidget {
@@ -23,7 +22,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
   @override
   Widget build(BuildContext context) {
     return GridView(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,

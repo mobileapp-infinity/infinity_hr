@@ -1,12 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:infinity_hr/api/api_urls.dart';
-import 'package:infinity_hr/models/Get_Employe_Pending_Approval_model.dart';
+import 'package:infinity_hr/models/Get_Employee_Pending_Approval_model.dart';
 import 'package:infinity_hr/models/get_today_in_out_time_model.dart';
 import 'package:infinity_hr/models/last_in_out_model.dart';
-import 'package:infinity_hr/screens/login_screen.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/utils/navigator_constants.dart';
 import 'package:infinity_hr/widgets/drawer_widget.dart';
@@ -31,6 +31,25 @@ enum DashboardMenuEnum {
   missPunchMissPunchApproval,
 }
 
+enum DrawerMenuEnum {
+  none,
+  myProfile,
+  viewLeaves,
+  addLeave,
+  viewCancelLeaves,
+  leaveApproval,
+  cancelLeaveApproval,
+  leaveBalance,
+  viewMissPunch,
+  addMissPunch,
+  missPunchApproval,
+  attendanceReport,
+  statistics,
+  salarySlip,
+  changePassword,
+  logOut,
+}
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
 
@@ -40,31 +59,37 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final RxBool _isWhichSelected = true.obs;
-  final RxBool _isLastInOutAvailbale = false.obs;
+  final RxBool _isLastInOutAvailable = false.obs;
   String _empCode = "";
   String _empId = "";
   String _userId = "";
-  RxInt totalpencount = 0.obs;
+  RxInt totalPenCount = 0.obs;
   List<LastInOutModel>? lastinoutmodel;
   GetTodayInOutTimeModel? getTodayInOutTimeModel;
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final Rx<DashboardMenuEnum> _dashboardMenuEnum =
       Rx<DashboardMenuEnum>(DashboardMenuEnum.none);
-
+  final Rx<DrawerMenuEnum> _drawerMenuEnum =
+      Rx<DrawerMenuEnum>(DrawerMenuEnum.none);
   void onDashboardMenuSelected(DashboardMenuEnum dashboardMenuEnum) {
     _dashboardMenuEnum.value = dashboardMenuEnum;
+  }
+
+  void onDrawerMenuSelected(DrawerMenuEnum drawerMenuEnum) {
+    _drawerMenuEnum.value = drawerMenuEnum;
+    print(_drawerMenuEnum.value);
   }
 
   @override
   void initState() {
     _prefs.then(
-      (prefeInstance) {
-        sharedPreferences = prefeInstance;
+      (prefsInstance) {
+        sharedPreferences = prefsInstance;
         getPreferencesAndVersionInfo();
         lastInOutApiCall();
         getTodayInOutTimeApiCall();
-        getEmployePendingApprovals();
+        getEmployeePendingApprovals();
       },
     );
     super.initState();
@@ -102,8 +127,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      drawer: DrawerWidget(
-        sharedprefs: sharedPreferences,
+      drawer: Obx(
+        () => DrawerWidget(
+          sharedprefs: sharedPreferences,
+          drawerMenuEnum: _drawerMenuEnum.value,
+          onDashboardMenuSelected: onDrawerMenuSelected,
+        ),
       ),
       body: Obx(
         () => _isWhichSelected.value
@@ -112,9 +141,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (_isLastInOutAvailbale.value)
+                    if (_isLastInOutAvailable.value)
                       Padding(
-                        padding: EdgeInsets.only(top: 10, right: 10, left: 10),
+                        padding:
+                            const EdgeInsets.only(top: 10, right: 10, left: 10),
                         child: LastInLastOutForLeave(
                             lastinoutmodel: lastinoutmodel),
                       ),
@@ -143,7 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   elevation: 0,
                                   child: Center(
                                     child: Text(
-                                      "Add Leave",
+                                      "Leave",
                                       style: TextStyle(
                                           fontSize:
                                               _isWhichSelected.value ? 17 : 15,
@@ -212,9 +242,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (_isLastInOutAvailbale.value)
+                    if (_isLastInOutAvailable.value)
                       Padding(
-                        padding: EdgeInsets.only(top: 10, right: 10, left: 10),
+                        padding:
+                            const EdgeInsets.only(top: 10, right: 10, left: 10),
                         child: LastInOutForMissPunch(
                             lastinoutmodel: lastinoutmodel),
                       ),
@@ -318,7 +349,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 () => MyBadge(
                   top: 6,
                   right: 2,
-                  value: totalpencount.toString(),
+                  value: totalPenCount.toString(),
                   child: Image.asset(
                     "assets/images/edt_profile.png",
                     scale: 2.5,
@@ -328,20 +359,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(left: 10),
+                padding: const EdgeInsets.only(left: 10),
                 child: Text(
-                  "Employe Code: $_empCode",
+                  "Employee Code: $_empCode",
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.only(right: 10),
               child: Obx(
                 () => Text(
                   NavigatorConstants.APP_VERSION.value.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -355,26 +386,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void lastInOutApiCall() async {
     try {
       final response = await http.get(
-          Uri.parse('${ApiUrls.BASE_URL}Get_Dashboard_detail?&emp_id=$_empId'));
+          Uri.parse('${ApiUrls.baseUrl}Get_Dashboard_detail?&emp_id=$_empId'));
       if (response.statusCode == 200) {
         lastinoutmodel = (json.decode(response.body) as List)
             .map((e) => LastInOutModel.fromJson(e))
             .toList(); //  LoginCheckModel.fromJson(jsonDecode(response.body[0]));
         if (lastinoutmodel != null) {
-          if (lastinoutmodel!.length == 0) {
+          if (lastinoutmodel!.isEmpty) {
             lastinoutmodel = [];
           } else {
-            _isLastInOutAvailbale.value = true;
+            _isLastInOutAvailable.value = true;
           }
         } else {
-          _isLastInOutAvailbale.value = false;
+          _isLastInOutAvailable.value = false;
         }
       } else {
-        // Get.snackbar("oops!", "something went wrong");
         throw Exception("Something Went Wrong");
       }
     } catch (error) {
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
     }
   }
 
@@ -382,46 +414,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       //http://iipl.iipl.info/ierphr.asmx/Get_Today_in_out_time?&user_id=201
       final response = await http.get(Uri.parse(
-          '${ApiUrls.BASE_URL}Get_Today_in_out_time?&user_id=$_userId'));
+          '${ApiUrls.baseUrl}Get_Today_in_out_time?&user_id=$_userId'));
       if (response.statusCode == 200) {
         List<GetTodayInOutTimeModel> inouttimemodel =
             (json.decode(response.body) as List)
                 .map((e) => GetTodayInOutTimeModel.fromJson(e))
                 .toList();
 
-        print("inTime${inouttimemodel[0].intime}");
-        print("outTime${inouttimemodel[0].outtime}");
-      } else {
-        throw Exception("Something Went Wrong");
-      }
-    } catch (error) {
-      print(error.toString());
-    }
-  }
-
-  void getEmployePendingApprovals() async {
-    try {
-      //http://iipl.iipl.info/ierphr.asmx/Get_Today_in_out_time?&user_id=201
-      final response = await http.get(Uri.parse(
-          '${ApiUrls.BASE_URL}Get_employee_pending_approvals?&user_id=$_userId'));
-      if (response.statusCode == 200) {
-        List<GetEmployePendingApproval> pendingapproval =
-            (json.decode(response.body) as List)
-                .map((e) => GetEmployePendingApproval.fromJson(e))
-                .toList();
-        if (pendingapproval.length > 0) {
-          for (int i = 1; i <= pendingapproval.length; i++) {
-            totalpencount.value =
-                pendingapproval[i - 1].penCount! + totalpencount.value;
-          }
-        } else {
-          totalpencount.value = 0;
+        if (kDebugMode) {
+          print("inTime${inouttimemodel[0].intime}");
+        }
+        if (kDebugMode) {
+          print("outTime${inouttimemodel[0].outtime}");
         }
       } else {
         throw Exception("Something Went Wrong");
       }
     } catch (error) {
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
+    }
+  }
+
+  void getEmployeePendingApprovals() async {
+    try {
+      //http://iipl.iipl.info/ierphr.asmx/Get_Today_in_out_time?&user_id=201
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.baseUrl}Get_employee_pending_approvals?&user_id=$_userId'));
+      if (response.statusCode == 200) {
+        List<GetEmployeePendingApproval> pendingapproval =
+            (json.decode(response.body) as List)
+                .map((e) => GetEmployeePendingApproval.fromJson(e))
+                .toList();
+        if (pendingapproval.isNotEmpty) {
+          for (int i = 1; i <= pendingapproval.length; i++) {
+            totalPenCount.value =
+                pendingapproval[i - 1].penCount! + totalPenCount.value;
+          }
+        } else {
+          totalPenCount.value = 0;
+        }
+      } else {
+        throw Exception("Something Went Wrong");
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error.toString());
+      }
     }
   }
 

@@ -1,4 +1,4 @@
 class ApiUrls {
   //TODO LIVE
-  static const String BASE_URL = "http://iipl.iipl.info/ierphr.asmx/";
+  static const String baseUrl = "http://iipl.iipl.info/ierphr.asmx/";
 }

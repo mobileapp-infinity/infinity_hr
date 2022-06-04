@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -22,6 +23,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: GestureDetector(
+            onTap: (){
+              Navigator.of(context).pop();
+            },
+            child: Image.asset("assets/images/ic_back_final.png",color: Colors.black,scale: 3.5,)),
+        title:const Text("Forgot Password",style: TextStyle(color: Colors.black),),
+        elevation: 0,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -33,7 +44,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
                 child: Text(
                   "Forgot Password",
@@ -84,7 +95,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               SizedBox(
                 width: deviceSize.width * 0.5,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   child: ElevatedButton(
                     style: ButtonStyle(
                       foregroundColor:
@@ -100,7 +111,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     onPressed: () {
                       if (_usernamecontroller.text == "") {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("please enter username")));
+                            const SnackBar(
+                                content: Text("please enter username")));
                         return;
                       }
                       String username = _usernamecontroller.text.trim();
@@ -132,7 +144,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         throw Exception("Something Went Wrong");
       }
     } catch (error) {
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
     }
   }
 }

@@ -3,20 +3,21 @@ class ChangePasswordModel {
 
   ChangePasswordModel({String? msg}) {
     if (msg != null) {
-      this._msg = msg;
+      _msg = msg;
     }
   }
 
-  String? get msg => _msg;
-  set msg(String? msg) => _msg = msg;
+  String? get msg {
+    return _msg;
+  }
 
   ChangePasswordModel.fromJson(Map<String, dynamic> json) {
     _msg = json['msg'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['msg'] = this._msg;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['msg'] = _msg;
     return data;
   }
 }

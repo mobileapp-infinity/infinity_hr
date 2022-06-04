@@ -7,7 +7,7 @@ import 'package:infinity_hr/api/api_urls.dart';
 import 'package:infinity_hr/api/dio_client.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 import 'package:infinity_hr/screens/login_screen.dart';
-import 'package:infinity_hr/models/verion_model.dart';
+import 'package:infinity_hr/models/version_model.dart';
 import 'package:infinity_hr/utils/app_dialogs.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/utils/icon_utils.dart';
@@ -22,13 +22,13 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   SharedPreferences? sharedPreferences;
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
   void initState() {
     _prefs.then(
-      (prefeInstance) {
-        sharedPreferences = prefeInstance;
+      (prefsInstance) {
+        sharedPreferences = prefsInstance;
         checkLoginAndGoAhead();
       },
     );
@@ -79,11 +79,11 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  void apicall() async {
+  void apiCall() async {
     AppDialog.showCustomizeProgressDialog(
         context: context, msg: 'Please wait...');
     Response response = await DioClient.getDioClient()!
-        .get(ApiUrls.BASE_URL + 'Get_app_version');
+        .get('${ApiUrls.baseUrl}Get_app_version');
     Navigator.of(context).pop();
     if (response.statusCode == 200) {
       List<version> updateverlist = (json.decode(response.data) as List)

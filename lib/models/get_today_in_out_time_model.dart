@@ -1,23 +1,21 @@
 class GetTodayInOutTimeModel {
-  String? _intime;
-  String? _outtime;
+  String? _inTime;
+  String? _outTime;
 
-  GetTodayInOutTimeModel({String? intime, String? outtime}) {
+  GetTodayInOutTimeModel({String? inTime, String? outTime}) {
     if (intime != null) {
-      this._intime = intime;
+      _inTime = intime;
     }
     if (outtime != null) {
-      this._outtime = outtime;
+      _outTime = outtime;
     }
   }
 
-  String? get intime => _intime;
-  set intime(String? intime) => _intime = intime;
-  String? get outtime => _outtime;
-  set outtime(String? outtime) => _outtime = outtime;
+  String? get intime => _inTime;
+  String? get outtime => _outTime;
 
   GetTodayInOutTimeModel.fromJson(Map<String, dynamic> json) {
-    _intime = json['intime'] ?? "-";
-    _outtime = json['outtime'] ?? "-";
+    _inTime = json['intime'] ?? "-";
+    _outTime = json['outtime'] ?? "-";
   }
 }

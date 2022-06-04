@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   LoginCheckModel? loginCheckModel;
   SharedPreferences? sharedPreferences;
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final RxBool _isObscure = true.obs;
   final RxBool _isLoading = false.obs;
   static const _redColor = CustomColor.colorPrimary;
@@ -33,8 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _prefs.then(
-      (prefeInstance) {
-        sharedPreferences = prefeInstance;
+      (prefsInstance) {
+        sharedPreferences = prefsInstance;
       },
     );
     super.initState();
@@ -204,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (_userIdController.text == "") {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: const Text("please enter username")));
+                                content: Text("please enter username")));
                         _isLoading.value = false;
                         return;
                       }
@@ -223,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Obx(
                       () => _isLoading.value
-                          ? SizedBox(
+                          ? const SizedBox(
                               height: 15,
                               width: 15,
                               child: CircularProgressIndicator(
@@ -259,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> loginApiCall(String username, String password) async {
     try {
       final response = await http.get(Uri.parse(
-          '${ApiUrls.BASE_URL}LoginCheck?&userName=$username&passWord=$password'));
+          '${ApiUrls.baseUrl}LoginCheck?&userName=$username&passWord=$password'));
       if (response.statusCode == 200) {
         loginCheckModel = (json.decode(response.body) as List)
             .map((e) => LoginCheckModel.fromJson(e))
@@ -281,7 +281,9 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (error) {
       Fluttertoast.showToast(msg: error.toString());
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
     }
   }
 
