@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,8 +16,8 @@ import 'package:infinity_hr/widgets/leave_widgets/last_in_out_widget_for_leave.d
 import 'package:infinity_hr/widgets/miss_punch_widgets/grid_widget_for_miss_punch.dart';
 import 'package:infinity_hr/widgets/miss_punch_widgets/last_in_out_for_miss_punch.dart';
 import 'package:infinity_hr/widgets/my_badge.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum DashboardMenuEnum {
   none,
@@ -72,13 +73,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Rx<DashboardMenuEnum>(DashboardMenuEnum.none);
   final Rx<DrawerMenuEnum> _drawerMenuEnum =
       Rx<DrawerMenuEnum>(DrawerMenuEnum.none);
+
   void onDashboardMenuSelected(DashboardMenuEnum dashboardMenuEnum) {
     _dashboardMenuEnum.value = dashboardMenuEnum;
   }
 
   void onDrawerMenuSelected(DrawerMenuEnum drawerMenuEnum) {
     _drawerMenuEnum.value = drawerMenuEnum;
-    print(_drawerMenuEnum.value);
+    if (kDebugMode) {
+      print(_drawerMenuEnum.value);
+    }
   }
 
   @override
