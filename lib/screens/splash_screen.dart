@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:infinity_hr/api/api_urls.dart';
-import 'package:infinity_hr/api/dio_client.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 import 'package:infinity_hr/screens/login_screen.dart';
 import 'package:infinity_hr/models/version_model.dart';
@@ -77,28 +76,5 @@ class _SplashScreenState extends State<SplashScreen> {
       textColor: Colors.white,
       fontSize: 16.0,
     );
-  }
-
-  void apiCall() async {
-    AppDialog.showCustomizeProgressDialog(
-        context: context, msg: 'Please wait...');
-    Response response = await DioClient.getDioClient()!
-        .get('${ApiUrls.baseUrl}Get_app_version');
-    Navigator.of(context).pop();
-    if (response.statusCode == 200) {
-      List<version> updateverlist = (json.decode(response.data) as List)
-          .map((x) => version.fromJson(x))
-          .toList();
-      if (updateverlist.isNotEmpty) {
-      } else {
-        _showToast(
-            message:
-                'Something went wrong,Please try again later ${response.statusCode}');
-      }
-    } else {
-      _showToast(
-          message:
-              'Something went wrong,Please try again later ${response.statusCode}');
-    }
   }
 }
