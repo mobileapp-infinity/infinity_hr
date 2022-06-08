@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/utils/navigator_constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonBottomSheet extends StatefulWidget {
   CommonBottomSheet({super.key, deviceSize, required this.devicesize});
@@ -13,6 +14,11 @@ class CommonBottomSheet extends StatefulWidget {
 }
 
 class _CommonBottomSheetState extends State<CommonBottomSheet> {
+
+
+  SharedPreferences? sharedPreferences;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+String empName = "";
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,12 +29,10 @@ class _CommonBottomSheetState extends State<CommonBottomSheet> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 10),
-              child: Obx(
-                () => Text(
-                  "Employee Code: ${NavigatorConstants.EMPLOYEE_CODE.value}",
+              child: Text(
+                  "Employee Code: ${empName}",
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
-                ),
               ),
             ),
           ),
@@ -44,6 +48,17 @@ class _CommonBottomSheetState extends State<CommonBottomSheet> {
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  void initState() {
+    _prefs.then(
+
+          (prefsInstance) {
+        sharedPreferences = prefsInstance;
+        empName = sharedPreferences!.getString('emp_code') ?? "";
+      },
     );
   }
 }

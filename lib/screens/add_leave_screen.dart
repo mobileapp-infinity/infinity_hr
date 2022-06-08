@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:infinity_hr/api/api_urls.dart';
+import 'package:infinity_hr/models/apply_cancel_leave_application.dart';
+import 'package:infinity_hr/models/cancel_leave_mail_model.dart';
 import 'package:infinity_hr/models/delete_leave.dart';
+import 'package:infinity_hr/models/employee_leave_balance_model.dart';
 import 'package:infinity_hr/models/get_employee_leave_days.dart';
 import 'package:infinity_hr/models/get_leave_detail_model.dart';
 import 'package:infinity_hr/models/getemployeeinouttime.dart';
@@ -30,22 +33,33 @@ class AddLeaveScreen extends StatefulWidget {
 class _AddLeaveScreenState extends State<AddLeaveScreen> {
   static const _redColor = CustomColor.colorPrimary;
 
-  RxBool _isLoading = false.obs;
+  final RxBool _isLoading = false.obs;
   bool _checkboxForEmergencyLeave = false;
   int groupValue = 0;
   String _fullName = "";
   String _userId = "";
   String _empId = "";
-  String? leaveDays = "";
   String dateForToDate = "";
   String dateForFromDate = "";
   String timeForToDate = "";
   String timeForFromDate = "";
+  RxDouble calculatedDays = 1.0.obs;
   DateTime firstDateOfToDate = DateTime.now();
-  TextEditingController _employeeNameController = TextEditingController();
-  TextEditingController _toDateController = TextEditingController();
-  TextEditingController _fromDateController = TextEditingController();
-  GetLeaveTypeAndReasonAndNoteStatusOne? getleavetypeandreasonandnotestatusone;
+  final TextEditingController _employeeNameController = TextEditingController();
+  final TextEditingController _leaveTypeController = TextEditingController();
+  final TextEditingController _leaveBalanceController = TextEditingController();
+  final TextEditingController _toDateController = TextEditingController();
+  final TextEditingController _fromDateController = TextEditingController();
+  final TextEditingController _dayCountController = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
+  final TextEditingController _reasonController = TextEditingController();
+  final TextEditingController _addressWhileOnLeaveController =
+      TextEditingController();
+  final TextEditingController _contactWhileOnLeaveController =
+      TextEditingController();
+  List<GetLeaveTypeAndReasonAndNoteStatusOne>?
+      getleavetypeandreasonandnotestatusone;
+ final RxBool _isLeaveTypeLoading = true.obs;
   GetLeaveTypeAndReasonAndNoteStatusTwo? getleavetypeandreasonandnotestatustwo;
   GetLeaveTypeAndReasonAndNoteStatusThree?
       getleavetypeandreasonandnotestatusthree;
@@ -54,6 +68,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   LeaveDetail? leaveDetail;
   InertLeave? insertLeave;
   DeleteLeave? deleteLeave;
+  EmployeeLeaveBalanceModel? employeeLeaveBalanceModel;
+  ApplyCancelLeaveApplication? applyCancelLeaveApplication;
+  CancelLeaveMail? cancelLeaveMail;
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -63,10 +80,12 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       (prefsInstance) {
         sharedPreferences = prefsInstance;
         _fullName = sharedPreferences!.getString('FullName') ?? "";
+        _employeeNameController.text = _fullName;
         _userId = sharedPreferences!.getString('usrm_id') ?? "";
-        _userId = sharedPreferences!.getString('emp_id') ?? "";
+        _empId = sharedPreferences!.getString('emp_id') ?? "";
       },
     );
+    getLeaveTypeAndReasonAndNoteApiCall();
     super.initState();
   }
 
@@ -87,7 +106,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -110,10 +128,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 25),
                     child: TextField(
+                      enabled: false,
                       cursorColor: CustomColor.colorPrimary,
                       controller: _employeeNameController,
                       decoration: const InputDecoration(
-                        hintText: "Employee name",
+                        hintText: "Employee Name",
                         border: InputBorder.none,
                         // enabledBorder: InputBorder.none,
                         // errorBorder: InputBorder.none,
@@ -132,7 +151,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               ),
             ), //Employee Name
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -142,50 +160,75 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                      padding: EdgeInsets.only(
-                          left: deviceSize.width * 0.06,
-                          top: deviceSize.height * 0.010),
-                      child: const Text(
-                        "Leave Type",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                        textAlign: TextAlign.start,
-                      )),
+                    padding: EdgeInsets.only(
+                        left: deviceSize.width * 0.06,
+                        top: deviceSize.height * 0.010),
+                    child: const Text(
+                      "Leave Type",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
-                    child: TextField(
-                      cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
-                      decoration: InputDecoration(
-                        hintText: "Select Leave",
-                        suffixIcon: DropdownButton(
-                            items: <String>['A', 'B', 'C', 'D']
-                                .map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (_) {}),
-                        border: InputBorder.none,
-                        // enabledBorder: InputBorder.none,
-                        // errorBorder: InputBorder.none,
-                        // focusedBorder: InputBorder.none,
-                        // focusedErrorBorder: InputBorder.none,
-                        // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            enabled: false,
+                            cursorColor: CustomColor.colorPrimary,
+                            controller: _leaveTypeController,
+                            decoration: const InputDecoration(
+                              hintText: "Select Leave",
+                              border: InputBorder.none,
+                              // enabledBorder: InputBorder.none,
+                              // errorBorder: InputBorder.none,
+                              // focusedBorder: InputBorder.none,
+                              // focusedErrorBorder: InputBorder.none,
+                              // prefixIcon: Image.asset("assets/images/envelop.png"),
+                              hintStyle: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            keyboardType: TextInputType.name,
+                          ),
                         ),
-                      ),
-                      keyboardType: TextInputType.name,
+                        Padding(
+                          padding:
+                              EdgeInsets.only(right: deviceSize.width * 0.04),
+                          child: DropdownButtonHideUnderline(
+                              child:Obx(()=> _isLeaveTypeLoading.value
+                                  ? const CircularProgressIndicator(color: Colors.white,)
+                                  : DropdownButton(
+                                //  hint: Text("hint"),
+                                  iconEnabledColor:
+                                  CustomColor.colorPrimary,
+                                  items: [
+                                    ...getleavetypeandreasonandnotestatusone!
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                        value: e.id,
+                                        child: Text(
+                                          '${e.ltmLeaveName}',
+                                          style: const TextStyle(
+                                              color: CustomColor.colorPrimary,
+                                              fontSize: 13.0),
+                                        ),
+                                      ),
+                                    )
+                                        .toList(),
+                                  ],
+                                  onChanged: (_) {})),)
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ), //Leave Type
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -208,7 +251,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
+                      controller: _leaveBalanceController,
                       decoration: const InputDecoration(
                         hintText: "Enter Balance Leave",
                         border: InputBorder.none,
@@ -229,7 +272,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               ),
             ), //Leave Balance
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -283,7 +325,10 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.calendar_month_outlined),
+                          icon: const Icon(
+                            Icons.calendar_month_outlined,
+                            color: CustomColor.colorPrimary,
+                          ),
                           onPressed: () {
                             showDatePicker(
                                 context: context,
@@ -343,7 +388,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               ),
             ), //From Date
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -390,12 +434,17 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.calendar_month_outlined),
+                          icon: const Icon(
+                            Icons.calendar_month_outlined,
+                            color: CustomColor.colorPrimary,
+                          ),
                           onPressed: () {
+                            print("first date$firstDateOfToDate");
+                            print("init date${DateTime.now()}");
                             showDatePicker(
                                 context: context,
                                 initialDate: DateTime.now(),
-                                firstDate: firstDateOfToDate,
+                                firstDate: DateTime(1900),
                                 lastDate: DateTime(2100),
                                 builder: (context, picker) {
                                   return Theme(
@@ -435,6 +484,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                         selectedTime.format(context);
                                     _toDateController.text =
                                         "$dateForToDate $timeForToDate";
+
+                                    calculateLeaveDaysApiCall(
+                                        dateForFromDate, dateForToDate);
                                   } else {
                                     return;
                                   }
@@ -450,7 +502,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               ),
             ), //To Date
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -471,31 +522,32 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 25, top: 3),
-                    child: TextField(
-                      cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Day",
-                        // enabledBorder: InputBorder.none,
-                        // errorBorder: InputBorder.none,
-                        // focusedBorder: InputBorder.none,
-                        // focusedErrorBorder: InputBorder.none,
-                        // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
+                      padding: const EdgeInsets.only(left: 25, top: 3),
+                      child: Obx(
+                        () => TextField(
+                          enabled: false,
+                          cursorColor: CustomColor.colorPrimary,
+                          controller: _dayCountController,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: calculatedDays.value.toString(),
+                            // enabledBorder: InputBorder.none,
+                            // errorBorder: InputBorder.none,
+                            // focusedBorder: InputBorder.none,
+                            // focusedErrorBorder: InputBorder.none,
+                            // prefixIcon: Image.asset("assets/images/envelop.png"),
+                            hintStyle: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          keyboardType: TextInputType.name,
                         ),
-                      ),
-                      keyboardType: TextInputType.name,
-                    ),
-                  ),
+                      )),
                 ],
               ),
             ), //Day
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -518,7 +570,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
+                      controller: _remarkController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "Enter Remark",
@@ -539,7 +591,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               ),
             ), //Remark
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -560,39 +611,63 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                       )),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
-                    child: TextField(
-                      cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
-                      decoration: InputDecoration(
-                        suffixIcon: DropdownButton(
-                            items: <String>['A', 'B', 'C', 'D']
-                                .map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (_) {}),
-                        hintText: "Select Reason",
-                        border: InputBorder.none,
-                        // enabledBorder: InputBorder.none,
-                        // errorBorder: InputBorder.none,
-                        // focusedBorder: InputBorder.none,
-                        // focusedErrorBorder: InputBorder.none,
-                        // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            enabled: false,
+                            cursorColor: CustomColor.colorPrimary,
+                            controller: _reasonController,
+                            decoration: const InputDecoration(
+                              // suffixIcon: DropdownButton(
+                              //     items: <String>['A', 'B', 'C', 'D']
+                              //         .map((String value) {
+                              //       return DropdownMenuItem<String>(
+                              //         value: value,
+                              //         child: Text(value),
+                              //       );
+                              //     }).toList(),
+                              //     onChanged: (_) {}),
+                              enabledBorder: InputBorder.none,
+
+                              hintText: "Select Reason",
+                              border: InputBorder.none,
+                              // enabledBorder: InputBorder.none,
+                              // errorBorder: InputBorder.none,
+                              // focusedBorder: InputBorder.none,
+                              // focusedErrorBorder: InputBorder.none,
+                              // prefixIcon: Image.asset("assets/images/envelop.png"),
+                              hintStyle: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            keyboardType: TextInputType.name,
+                          ),
                         ),
-                      ),
-                      keyboardType: TextInputType.name,
+                        Padding(
+                          padding:
+                              EdgeInsets.only(right: deviceSize.width * 0.04),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                                iconEnabledColor: CustomColor.colorPrimary,
+                                items: <String>['A', 'B', 'C', 'D']
+                                    .map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (_) {}),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ), //Reason
             Container(
-              height: deviceSize.height * 0.20,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -615,7 +690,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
+                      controller: _addressWhileOnLeaveController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "Enter Address",
@@ -636,7 +711,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               ),
             ), //Address
             Container(
-              height: deviceSize.height * 0.10,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -648,7 +722,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   Padding(
                       padding: EdgeInsets.only(
                           left: deviceSize.width * 0.06,
-                          top: deviceSize.height * 0.010),
+                          top: deviceSize.height * 0.020),
                       child: const Text(
                         "Contact no While On Leave",
                         style: TextStyle(
@@ -659,7 +733,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
+                      controller: _contactWhileOnLeaveController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "Enter Contact no",
@@ -824,9 +898,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 strokeWidth: 2.0,
                               ),
                             )
-                          : const Text(
-                              "Cancel",
-                            ),
+                          : const Text("Cancel"),
                     ),
                   ),
                 ), //Cancel
@@ -852,8 +924,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             getleavetypeandreasonandnotestatusone = (json.decode(response.body)
                     as List)
                 .map((e) => GetLeaveTypeAndReasonAndNoteStatusOne.fromJson(e))
-                .toList()
-                .first;
+                .toList();
+            _isLeaveTypeLoading.value = false;
+            // addDataToLists();
           } else if (i == 2) {
             getleavetypeandreasonandnotestatustwo = (json.decode(response.body)
                     as List)
@@ -868,10 +941,10 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 .first;
           }
         } else {
-          Fluttertoast.showToast(msg: "Please Try Again Later");
+          _showToast(msg: "Please Try Again Later");
         }
       } catch (error) {
-        Fluttertoast.showToast(msg: error.toString());
+        _showToast(msg: error.toString());
         if (kDebugMode) {
           print(error.toString());
         }
@@ -899,7 +972,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         return "something Went Wrong please try again later";
       }
     } catch (error) {
-      Fluttertoast.showToast(msg: error.toString());
+      _showToast(msg: error.toString());
       if (kDebugMode) {
         print(error.toString());
       }
@@ -908,23 +981,29 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
 
   calculateLeaveDaysApiCall(String fromDate, String toDate) async {
     try {
+      print(fromDate);
+      print(toDate);
       final response = await http.get(Uri.parse(
-          '${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId'));
+          '${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=120'));
+      // print('${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId');
       if (kDebugMode) {
-        print(_empId);
+        // print(_empId);
       }
       if (response.statusCode == 200) {
         getEmployeeLeaveDays = (json.decode(response.body) as List)
             .map((e) => GetEmployeeLeaveDays.fromJson(e))
             .toList()
             .first;
-
-        leaveDays = getEmployeeLeaveDays!.days;
+        calculatedDays.value = double.parse(getEmployeeLeaveDays!.days!);
+        print("calculated days ${calculatedDays.value}");
+        //print(getEmployeeLeaveDays!.msg);
+        calculatedDays.value = double.parse(getEmployeeLeaveDays!.days!);
+        print(calculatedDays.value);
       } else {
         return "something Went Wrong please try again later";
       }
     } catch (error) {
-      Fluttertoast.showToast(msg: error.toString());
+      _showToast(msg: error.toString());
       if (kDebugMode) {
         print(error.toString());
       }
@@ -965,7 +1044,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         return "something Went Wrong please try again later";
       }
     } catch (error) {
-      Fluttertoast.showToast(msg: error.toString());
+      _showToast(msg: error.toString());
       if (kDebugMode) {
         print(error.toString());
       }
@@ -981,19 +1060,19 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             .map((e) => DeleteLeave.fromJson(e))
             .toList()
             .first;
-        Fluttertoast.showToast(msg: deleteLeave!.msg.toString());
+        _showToast(msg: deleteLeave!.msg.toString());
       }
       if (response.statusCode == 200) {
       } else {
         return "something Went Wrong please try again later";
       }
     } catch (error) {
-      Fluttertoast.showToast(msg: error.toString());
+      _showToast(msg: error.toString());
       if (kDebugMode) {
         print(error.toString());
       }
     }
-  }
+  } //employee_leave_application_mst_delete
 
   getLeaveDetailApiCall(String id) async {
     try {
@@ -1004,17 +1083,107 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             .map((e) => LeaveDetail.fromJson(e))
             .toList()
             .first;
-        Fluttertoast.showToast(msg: leaveDetail!.id.toString());
       }
       if (response.statusCode == 200) {
+        _showToast(msg: leaveDetail!.id.toString());
       } else {
-        return "something Went Wrong please try again later";
+        _showToast(msg: 'something Went Wrong please try again later');
       }
     } catch (error) {
-      Fluttertoast.showToast(msg: error.toString());
+      _showToast(msg: error.toString());
       if (kDebugMode) {
         print(error.toString());
       }
     }
+  } //Get_leave_detail
+
+  void calculateLeaveBalance(String leaveType) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.baseUrl}Get_Employee_Leave_balance?&emp_id=$_empId&leave_type=$leaveType'));
+      if (kDebugMode) {
+        employeeLeaveBalanceModel = (json.decode(response.body) as List)
+            .map((e) => EmployeeLeaveBalanceModel.fromJson(e))
+            .toList()
+            .first;
+      }
+      if (response.statusCode == 200) {
+        _showToast(msg: employeeLeaveBalanceModel!.balance.toString());
+      } else {
+        _showToast(msg: 'something Went Wrong please try again later');
+      }
+    } catch (error) {
+      _showToast(msg: error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
+    }
+  } //Get_Employee_Leave_balance
+
+  void applyCancelLeaveApplicationApiCall(
+      String id, String userId, String leaveType) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.baseUrl}Apply_Cancel_Leave_application?&emp_id=$_empId&leave_type=$leaveType'));
+      if (kDebugMode) {
+        applyCancelLeaveApplication = (json.decode(response.body) as List)
+            .map((e) => ApplyCancelLeaveApplication.fromJson(e))
+            .toList()
+            .first;
+      }
+      if (response.statusCode == 200) {
+        _showToast(msg: employeeLeaveBalanceModel!.balance.toString());
+      } else {
+        _showToast(msg: 'something Went Wrong please try again later');
+      }
+    } catch (error) {
+      _showToast(msg: error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
+    }
+  } //Apply_Cancel_Leave_application
+
+  void ApplyCancelLeaveMailSend(String id) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.baseUrl}Apply_Cancel_Leave_application?&id=$id'));
+      if (kDebugMode) {
+        cancelLeaveMail = (json.decode(response.body) as List)
+            .map((e) => CancelLeaveMail.fromJson(e))
+            .toList()
+            .first;
+      }
+      if (response.statusCode == 200) {
+        _showToast(msg: cancelLeaveMail!.Data.toString());
+      } else {
+        _showToast(msg: 'something Went Wrong please try again later');
+      }
+    } catch (error) {
+      _showToast(msg: error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
+    }
+  } //Apply_Cancel_Leave_application
+
+  //
+  // addDataToLists(){
+  //   for(int i=1;i<getleavetypeandreasonandnotestatusone!.length - 1 ;i++){
+  //     _LeaveType.add(getleavetypeandreasonandnotestatusone![i].ltmLeaveName!);
+  //   }
+  // }
+  //
+
+  void _showToast({required String msg}) {
+    Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: CustomColor.colorPrimary,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 }
