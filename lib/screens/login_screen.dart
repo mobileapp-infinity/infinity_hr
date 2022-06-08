@@ -10,6 +10,7 @@ import 'package:infinity_hr/screens/ForgotPasswordScreen.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 import 'package:infinity_hr/models/login_check_model.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
+import 'package:infinity_hr/utils/navigator_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -218,8 +219,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       String username = _userIdController.text.trim();
                       String password = _passwordController.text.trim();
 
-                      loginApiCall(username, password)
-                          .then((value) => _isLoading.value = false);
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const DashboardScreen(),
+                        ),
+                      );
+                      // loginApiCall(username, password)
+                      //     .then((value) => _isLoading.value = false);
                     },
                     child: Obx(
                       () => _isLoading.value
@@ -289,6 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> setPrefrences(LoginCheckModel model) async {
     sharedPreferences!.setString("emp_code", model.empCode.toString());
+    NavigatorConstants.EMPLOYEE_CODE.value = model.empCode??"-";
     sharedPreferences!.setString("usrm_dis_name", model.usrmDisName.toString());
     sharedPreferences!.setString("usrm_name", model.usrmName.toString());
     sharedPreferences!.setString("usrm_id", model.usrmId.toString());

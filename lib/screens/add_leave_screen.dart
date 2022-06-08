@@ -5,15 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:infinity_hr/api/api_urls.dart';
+import 'package:infinity_hr/models/delete_leave.dart';
+import 'package:infinity_hr/models/get_employee_leave_days.dart';
+import 'package:infinity_hr/models/get_leave_detail_model.dart';
 import 'package:infinity_hr/models/getemployeeinouttime.dart';
 import 'package:infinity_hr/models/getleavetypeandreasonandnotestatusone.dart';
 import 'package:infinity_hr/models/getleavetypeandreasonandnotestatusthree.dart';
 import 'package:infinity_hr/models/getleavetypeandreasonandnotestatustwo.dart';
+import 'package:infinity_hr/models/insert_leave.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/widgets/common_appbar.dart';
 import 'package:infinity_hr/widgets/common_bottom_sheet.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class AddLeaveScreen extends StatefulWidget {
   const AddLeaveScreen({Key? key}) : super(key: key);
@@ -24,19 +29,31 @@ class AddLeaveScreen extends StatefulWidget {
 
 class _AddLeaveScreenState extends State<AddLeaveScreen> {
   static const _redColor = CustomColor.colorPrimary;
+
   RxBool _isLoading = false.obs;
   bool _checkboxForEmergencyLeave = false;
   int groupValue = 0;
   String _fullName = "";
   String _userId = "";
   String _empId = "";
-
+  String? leaveDays = "";
+  String dateForToDate = "";
+  String dateForFromDate = "";
+  String timeForToDate = "";
+  String timeForFromDate = "";
+  DateTime firstDateOfToDate = DateTime.now();
   TextEditingController _employeeNameController = TextEditingController();
+  TextEditingController _toDateController = TextEditingController();
+  TextEditingController _fromDateController = TextEditingController();
   GetLeaveTypeAndReasonAndNoteStatusOne? getleavetypeandreasonandnotestatusone;
   GetLeaveTypeAndReasonAndNoteStatusTwo? getleavetypeandreasonandnotestatustwo;
   GetLeaveTypeAndReasonAndNoteStatusThree?
       getleavetypeandreasonandnotestatusthree;
   GetEmployeeInOutTime? getEmployeeInOutTime;
+  GetEmployeeLeaveDays? getEmployeeLeaveDays;
+  LeaveDetail? leaveDetail;
+  InertLeave? insertLeave;
+  DeleteLeave? deleteLeave;
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -48,7 +65,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         _fullName = sharedPreferences!.getString('FullName') ?? "";
         _userId = sharedPreferences!.getString('usrm_id') ?? "";
         _userId = sharedPreferences!.getString('emp_id') ?? "";
-        getleavetypeandreasonandnote();
       },
     );
     super.initState();
@@ -57,6 +73,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   @override
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
+    DateFormat dateFormat = DateFormat("dd/MM/yyyy "); //HH:mm:ss
     return Scaffold(
       appBar: CommonAppBar(
         title: "Add Leave",
@@ -103,7 +120,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         // focusedBorder: InputBorder.none,
                         // focusedErrorBorder: InputBorder.none,
                         // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontSize: 18,
                           color: Colors.grey,
                         ),
@@ -156,7 +173,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         // focusedBorder: InputBorder.none,
                         // focusedErrorBorder: InputBorder.none,
                         // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: TextStyle(
+                        hintStyle: const TextStyle(
                           fontSize: 18,
                           color: Colors.grey,
                         ),
@@ -200,7 +217,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         // focusedBorder: InputBorder.none,
                         // focusedErrorBorder: InputBorder.none,
                         // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontSize: 18,
                           color: Colors.grey,
                         ),
@@ -227,30 +244,99 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           top: deviceSize.height * 0.010),
                       child: const Text(
                         "From Date",
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                         textAlign: TextAlign.start,
                       )),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
-                    child: TextField(
-                      cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
-                      decoration: const InputDecoration(
-                        hintText: "06/06/2022",
-                        border: InputBorder.none,
-                        suffixIcon: Icon(Icons.calendar_month_outlined),
-                        // enabledBorder: InputBorder.none,
-                        // errorBorder: InputBorder.none,
-                        // focusedBorder: InputBorder.none,
-                        // focusedErrorBorder: InputBorder.none,
-                        // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            enabled: false,
+                            // onTap: () {
+                            //   showDatePicker(
+                            //       context: context,
+                            //       initialDate: DateTime.now(),
+                            //       firstDate: DateTime(1900),
+                            //       lastDate: DateTime(2100));
+                            // },
+                            focusNode: FocusNode(canRequestFocus: false),
+                            cursorColor: CustomColor.colorPrimary,
+                            controller: _fromDateController,
+                            decoration: InputDecoration(
+                              hintText:
+                                  "${dateFormat.format(DateTime.now())} 9:00 AM",
+                              border: InputBorder.none,
+                              // enabledBorder: InputBorder.none,
+                              // errorBorder: InputBorder.none,
+                              // focusedBorder: InputBorder.none,
+                              // focusedErrorBorder: InputBorder.none,
+                              // prefixIcon: Image.asset("assets/images/envelop.png"),
+                              hintStyle: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            keyboardType: TextInputType.name,
+                          ),
                         ),
-                      ),
-                      keyboardType: TextInputType.name,
+                        IconButton(
+                          icon: const Icon(Icons.calendar_month_outlined),
+                          onPressed: () {
+                            showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime(2100),
+                                builder: (context, picker) {
+                                  return Theme(
+                                    //TODO: change colors
+                                    data: ThemeData.dark().copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: CustomColor.colorPrimary,
+                                        onPrimary: Colors.white,
+                                        surface: CustomColor.colorPrimary,
+                                        //
+                                      ),
+                                      dialogBackgroundColor: Colors.white,
+                                    ),
+                                    child: picker!,
+                                  );
+                                }).then((selectedDate) {
+                              //TODO: handle selected date
+                              if (selectedDate != null) {
+                                firstDateOfToDate = selectedDate;
+                                print(selectedDate);
+                                var sdate = dateFormat.format(selectedDate);
+                                dateForFromDate = sdate.toString();
+                              } else {
+                                return;
+                              }
+                            }).then((_) {
+                              if (dateForFromDate != "") {
+                                showTimePicker(
+                                    context: context,
+                                    initialTime: const TimeOfDay(
+                                      hour: 09,
+                                      minute: 00,
+                                    )).then((selectedTime) {
+                                  if (selectedTime != null) {
+                                    print(selectedTime.format(context));
+                                    timeForFromDate =
+                                        selectedTime.format(context);
+                                    _fromDateController.text =
+                                        "$dateForFromDate $timeForFromDate";
+                                  } else {
+                                    return;
+                                  }
+                                });
+                              }
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -267,35 +353,97 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                      padding: EdgeInsets.only(
-                          left: deviceSize.width * 0.06,
-                          top: deviceSize.height * 0.010),
-                      child: const Text(
-                        "From Date",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                        textAlign: TextAlign.start,
-                      )),
+                    padding: EdgeInsets.only(
+                        left: deviceSize.width * 0.06,
+                        top: deviceSize.height * 0.010),
+                    child: const Text(
+                      "To Date",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
-                    child: TextField(
-                      cursorColor: CustomColor.colorPrimary,
-                      controller: _employeeNameController,
-                      decoration: const InputDecoration(
-                        hintText: "06/06/2022",
-                        border: InputBorder.none,
-                        suffixIcon: Icon(Icons.calendar_month_outlined),
-                        // enabledBorder: InputBorder.none,
-                        // errorBorder: InputBorder.none,
-                        // focusedBorder: InputBorder.none,
-                        // focusedErrorBorder: InputBorder.none,
-                        // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            enabled: false,
+                            cursorColor: CustomColor.colorPrimary,
+                            controller: _toDateController,
+                            decoration: InputDecoration(
+                              hintText:
+                                  "${dateFormat.format(DateTime.now())} 7:00 PM",
+                              border: InputBorder.none,
+                              // enabledBorder: InputBorder.none,
+                              // errorBorder: InputBorder.none,
+                              // focusedBorder: InputBorder.none,
+                              // focusedErrorBorder: InputBorder.none,
+                              // prefixIcon: Image.asset("assets/images/envelop.png"),
+                              hintStyle: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            keyboardType: TextInputType.name,
+                          ),
                         ),
-                      ),
-                      keyboardType: TextInputType.name,
+                        IconButton(
+                          icon: const Icon(Icons.calendar_month_outlined),
+                          onPressed: () {
+                            showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: firstDateOfToDate,
+                                lastDate: DateTime(2100),
+                                builder: (context, picker) {
+                                  return Theme(
+                                    //
+                                    //TODO: change colors
+                                    data: ThemeData.dark().copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: CustomColor.colorPrimary,
+                                        onPrimary: Colors.white,
+                                        surface: CustomColor.colorPrimary,
+                                        //
+                                      ),
+                                      dialogBackgroundColor: Colors.white,
+                                    ),
+                                    child: picker!,
+                                  );
+                                }).then((selectedDate) {
+                              //TODO: handle selected date
+                              if (selectedDate != null) {
+                                print(selectedDate);
+                                var sdate = dateFormat.format(selectedDate);
+                                dateForToDate = sdate.toString();
+                              } else {
+                                return;
+                              }
+                            }).then((_) {
+                              if (dateForToDate != "") {
+                                showTimePicker(
+                                    context: context,
+                                    initialTime: const TimeOfDay(
+                                      hour: 19,
+                                      minute: 00,
+                                    )).then((selectedTime) {
+                                  if (selectedTime != null) {
+                                    print(selectedTime.format(context));
+                                    timeForToDate =
+                                        selectedTime.format(context);
+                                    _toDateController.text =
+                                        "$dateForToDate $timeForToDate";
+                                  } else {
+                                    return;
+                                  }
+                                });
+                              }
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -312,15 +460,16 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                      padding: EdgeInsets.only(
-                          left: deviceSize.width * 0.06,
-                          top: deviceSize.height * 0.010),
-                      child: const Text(
-                        "Day",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                        textAlign: TextAlign.start,
-                      )),
+                    padding: EdgeInsets.only(
+                        left: deviceSize.width * 0.06,
+                        top: deviceSize.height * 0.010),
+                    child: const Text(
+                      "Day",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
@@ -328,13 +477,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                       controller: _employeeNameController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: "day",
+                        hintText: "Day",
                         // enabledBorder: InputBorder.none,
                         // errorBorder: InputBorder.none,
                         // focusedBorder: InputBorder.none,
                         // focusedErrorBorder: InputBorder.none,
                         // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontSize: 18,
                           color: Colors.grey,
                         ),
@@ -361,7 +510,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           top: deviceSize.height * 0.010),
                       child: const Text(
                         "Remarks",
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                         textAlign: TextAlign.start,
                       )),
@@ -378,7 +527,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         // focusedBorder: InputBorder.none,
                         // focusedErrorBorder: InputBorder.none,
                         // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontSize: 18,
                           color: Colors.grey,
                         ),
@@ -475,7 +624,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         // focusedBorder: InputBorder.none,
                         // focusedErrorBorder: InputBorder.none,
                         // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontSize: 18,
                           color: Colors.grey,
                         ),
@@ -519,7 +668,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         // focusedBorder: InputBorder.none,
                         // focusedErrorBorder: InputBorder.none,
                         // prefixIcon: Image.asset("assets/images/envelop.png"),
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontSize: 18,
                           color: Colors.grey,
                         ),
@@ -532,11 +681,10 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             ), //contact while on Leave
             const Padding(
                 padding: EdgeInsets.only(left: 20),
-                child: const Text(
+                child: Text(
                   "Load Adjust :-",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 )), //Load Adjust
-
             Padding(
               padding: EdgeInsets.only(left: deviceSize.width * 0.4),
               child: ListTile(
@@ -594,15 +742,15 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   }),
             ), //radio 3
             const Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: const SizedBox(
+              padding: EdgeInsets.only(left: 20.0),
+              child: SizedBox(
                 child: Padding(
-                    padding: EdgeInsets.only(bottom: 45),
-                    child: Text(
-                      "Note:- ",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    )),
+                  padding: EdgeInsets.only(bottom: 45),
+                  child: Text(
+                    "Note:- ",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
             ), //Note:-
             Row(
@@ -647,7 +795,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     style: ButtonStyle(
                       elevation: MaterialStateProperty.all(0),
                       side: MaterialStateProperty.all(
-                        BorderSide(
+                        const BorderSide(
                           style: BorderStyle.solid,
                           color: Colors.black26,
                           width: 1.0,
@@ -663,7 +811,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
                     child: Obx(
                       () => _isLoading.value
                           ? const SizedBox(
@@ -691,7 +841,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
     );
   }
 
-  getleavetypeandreasonandnote() async {
+  getLeaveTypeAndReasonAndNoteApiCall() async {
     for (int i = 1; i <= 3; i++) {
       try {
         final response = await http.get(Uri.parse(
@@ -727,7 +877,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         }
       }
     }
-  }
+  } //Get_leave_type_and_reason_and_note
 
   defaultInOutTimeDisplayApiCall() async {
 //response :-[{"ebd_value":1,"ebd_name":"Social"},{"ebd_value":2,"ebd_name":"Personal"},{"ebd_value":3,"ebd_name":"Medical"},
@@ -754,11 +904,34 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         print(error.toString());
       }
     }
-  }
+  } //Get_employee_inout_time
 
-  calculateLeaveDays() {}
+  calculateLeaveDaysApiCall(String fromDate, String toDate) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId'));
+      if (kDebugMode) {
+        print(_empId);
+      }
+      if (response.statusCode == 200) {
+        getEmployeeLeaveDays = (json.decode(response.body) as List)
+            .map((e) => GetEmployeeLeaveDays.fromJson(e))
+            .toList()
+            .first;
 
-  addLeave(
+        leaveDays = getEmployeeLeaveDays!.days;
+      } else {
+        return "something Went Wrong please try again later";
+      }
+    } catch (error) {
+      Fluttertoast.showToast(msg: error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
+    }
+  } //Get_Employee_Leave_Days
+
+  addLeaveApiCall(
       {leaveId,
       leaveType,
       fromDate,
@@ -784,10 +957,56 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
           '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=$leaveId&emp_id=$_empId&leave_type=$leaveType&from_date=$fromDate&to_date=$toDate&remark=$remark&reason=$reasonId&load_adjusted=$loadAdjustId&emergency_leave=$isEmergency&user_id=$_userId&ip_address="1"&leave_balance=$leaveBalance'));
       if (kDebugMode) {}
       if (response.statusCode == 200) {
-        getEmployeeInOutTime = (json.decode(response.body) as List)
-            .map((e) => GetEmployeeInOutTime.fromJson(e))
+        insertLeave = (json.decode(response.body) as List)
+            .map((e) => InertLeave.fromJson(e))
             .toList()
             .first;
+      } else {
+        return "something Went Wrong please try again later";
+      }
+    } catch (error) {
+      Fluttertoast.showToast(msg: error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
+    }
+  } //Employee_leave_application_insert
+
+  deleteLeaveApiCall(String id) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.baseUrl}employee_leave_application_mst_delete?&id=$id&user_id=$_userId&empid=$_empId&ip="1"'));
+      if (kDebugMode) {
+        deleteLeave = (json.decode(response.body) as List)
+            .map((e) => DeleteLeave.fromJson(e))
+            .toList()
+            .first;
+        Fluttertoast.showToast(msg: deleteLeave!.msg.toString());
+      }
+      if (response.statusCode == 200) {
+      } else {
+        return "something Went Wrong please try again later";
+      }
+    } catch (error) {
+      Fluttertoast.showToast(msg: error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
+    }
+  }
+
+  getLeaveDetailApiCall(String id) async {
+    try {
+      final response = await http
+          .get(Uri.parse('${ApiUrls.baseUrl}Get_leave_detail?&id=$id'));
+      if (kDebugMode) {
+        leaveDetail = (json.decode(response.body) as List)
+            .map((e) => LeaveDetail.fromJson(e))
+            .toList()
+            .first;
+        Fluttertoast.showToast(msg: leaveDetail!.id.toString());
+      }
+      if (response.statusCode == 200) {
       } else {
         return "something Went Wrong please try again later";
       }
