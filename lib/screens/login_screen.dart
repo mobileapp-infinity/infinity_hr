@@ -10,6 +10,7 @@ import 'package:infinity_hr/screens/ForgotPasswordScreen.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 import 'package:infinity_hr/models/login_check_model.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
+import 'package:infinity_hr/utils/navigator_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -218,6 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       String username = _userIdController.text.trim();
                       String password = _passwordController.text.trim();
 
+
                       loginApiCall(username, password)
                           .then((value) => _isLoading.value = false);
                     },
@@ -265,6 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
             .map((e) => LoginCheckModel.fromJson(e))
             .toList()
             .first; //  LoginCheckModel.fromJson(jsonDecode(response.body[0]));
+        print(response.body);
         if (loginCheckModel!.status == 1) {
           setPrefrences(loginCheckModel!);
           Navigator.of(context).pushReplacement(
@@ -288,10 +291,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> setPrefrences(LoginCheckModel model) async {
-    sharedPreferences!.setString("emp_code", model.empCode.toString());
-    sharedPreferences!.setString("usrm_dis_name", model.usrmDisName.toString());
-    sharedPreferences!.setString("usrm_name", model.usrmName.toString());
-    sharedPreferences!.setString("usrm_id", model.usrmId.toString());
-    sharedPreferences!.setString("emp_id", model.empId.toString());
+    sharedPreferences!.setString("emp_code", model.empCode.toString());//9026
+    NavigatorConstants.EMPLOYEE_CODE.value = model.empCode??"-";
+    sharedPreferences!.setString("usrm_dis_name", model.usrmDisName.toString());//BANSI BARAI
+    sharedPreferences!.setString("usrm_name", model.usrmName.toString());//T-9026
+    sharedPreferences!.setString("usrm_id", model.usrmId.toString());//246
+    sharedPreferences!.setString("emp_id", model.empId.toString());//138
+    sharedPreferences!.setString("FullName", model.fullName.toString());//BANSI SANJAYKUMAR BARAI
   }
 }
