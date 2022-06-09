@@ -10,19 +10,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97e936ad-5c63-4618-9371-286ec1f69815" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/models/apply_cancel_leave_application.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/models/cancel_leave_mail_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/models/employee_leave_balance_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-v21/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-v21/launch_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable/launch_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/api/api_urls.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_urls.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/getleavetypeandreasonandnotestatusone.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/getleavetypeandreasonandnotestatusone.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/getleavetypeandreasonandnotestatustwo.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/getleavetypeandreasonandnotestatustwo.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screens/add_leave_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/add_leave_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/login_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/widgets/common_bottom_sheet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/common_bottom_sheet.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,98 +163,98 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>981</line>
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>983</line>
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>984</line>
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>991</line>
+          <line>1021</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>992</line>
+          <line>1022</line>
           <option name="timeStamp" value="35" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>996</line>
+          <line>1026</line>
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>998</line>
+          <line>1028</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>999</line>
+          <line>1029</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1000</line>
+          <line>1030</line>
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1002</line>
+          <line>1032</line>
           <option name="timeStamp" value="40" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1004</line>
+          <line>1034</line>
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>927</line>
-          <option name="timeStamp" value="42" />
+          <line>487</line>
+          <option name="timeStamp" value="53" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>915</line>
-          <option name="timeStamp" value="44" />
+          <line>1011</line>
+          <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>918</line>
-          <option name="timeStamp" value="45" />
+          <line>1015</line>
+          <option name="timeStamp" value="55" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>921</line>
-          <option name="timeStamp" value="46" />
+          <line>1016</line>
+          <option name="timeStamp" value="57" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>922</line>
-          <option name="timeStamp" value="47" />
+          <line>488</line>
+          <option name="timeStamp" value="58" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>923</line>
-          <option name="timeStamp" value="48" />
+          <line>480</line>
+          <option name="timeStamp" value="59" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>925</line>
-          <option name="timeStamp" value="49" />
+          <line>481</line>
+          <option name="timeStamp" value="60" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>926</line>
-          <option name="timeStamp" value="50" />
+          <line>482</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
+          <line>483</line>
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
+          <line>484</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
+          <line>485</line>
+          <option name="timeStamp" value="64" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

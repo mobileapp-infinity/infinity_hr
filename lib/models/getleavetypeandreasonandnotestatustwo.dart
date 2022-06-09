@@ -1,8 +1,9 @@
 class GetLeaveTypeAndReasonAndNoteStatusTwo {
+  int position = 0;
   int? ebdValue;
   String? ebdName;
 
-  GetLeaveTypeAndReasonAndNoteStatusTwo({this.ebdValue, this.ebdName});
+  GetLeaveTypeAndReasonAndNoteStatusTwo({required this.position,this.ebdValue, this.ebdName});
 
   GetLeaveTypeAndReasonAndNoteStatusTwo.fromJson(Map<String, dynamic> json) {
     ebdValue = json['ebd_value'];
