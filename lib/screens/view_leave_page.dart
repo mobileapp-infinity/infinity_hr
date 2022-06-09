@@ -55,7 +55,7 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
         elevation: 0,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -76,7 +76,7 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         'View Leaves',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -84,8 +84,8 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
                           fontSize: 16.0,
                         ),
                       ),
-                      Spacer(),
-                      Text(
+                      const Spacer(),
+                      const Text(
                         'Pending/All',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -98,7 +98,9 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
                       ),
                       Switch(
                         value: true,
-                        onChanged: (value) {},
+                        onChanged: (value) {
+
+                        },
                       ),
                       const SizedBox(
                         width: 8.0,
