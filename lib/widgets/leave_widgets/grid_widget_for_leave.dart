@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinity_hr/screens/add_leave_screen.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
+import 'package:infinity_hr/screens/view_leave_page.dart';
 
 class GridViewForLeave extends StatefulWidget {
   late DashboardMenuEnum dashboardMenuEnum;
@@ -35,6 +36,8 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
         InkWell(
           onTap: () {
             widget.onDashboardMenuSelected(DashboardMenuEnum.leaveViewLeaves);
+            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ViewLeaveScreen()));
+
           },
           child: Card(
             elevation: 5,

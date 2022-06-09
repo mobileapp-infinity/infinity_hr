@@ -478,6 +478,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
                 // Navigator.of(context).pushReplacement(
                 //     MaterialPageRoute(builder: (context) => LoginScreen())
+                widget.sharedprefs!.clear();
                 logOut().then(
                   (_) => Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => LoginScreen())),

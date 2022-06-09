@@ -22,8 +22,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
       ),
       debugShowCheckedModeBanner: false,
-      // home: const SplashScreen(),
-      home: const ViewLeaveScreen(),
+      home: const SplashScreen(),
     );
   }
 }

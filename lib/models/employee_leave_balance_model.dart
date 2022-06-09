@@ -9,11 +9,11 @@ class EmployeeLeaveBalanceModel {
 }
 
 class LeaveListModel{
-  String? SrNo;
-  String? id;
-  String? From_date;
-  String? To_date;
-  String? Leave_Status;
+  dynamic? SrNo;
+  dynamic? id;
+  dynamic? From_date;
+  dynamic? To_date;
+  dynamic? Leave_Status;
   LeaveListModel({this.SrNo,this.id,this.From_date,this.To_date,this.Leave_Status});
 
 

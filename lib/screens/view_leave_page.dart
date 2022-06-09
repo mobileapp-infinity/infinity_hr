@@ -1,14 +1,14 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:infinity_hr/api/api_urls.dart';
 import 'package:infinity_hr/models/employee_leave_balance_model.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/utils/navigator_constants.dart';
-import 'package:infinity_hr/widgets/my_badge.dart';
+import 'package:infinity_hr/widgets/common_bottom_sheet.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -22,15 +22,13 @@ class ViewLeaveScreen extends StatefulWidget {
 
 class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
   RxInt totalPenCount = 0.obs;
-  String _empCode = "";
   String _empId = "";
-  String _userId = "";
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  late RxBool _pendingAllSwitch = false.obs;
+  late final RxBool _pendingAllSwitch = false.obs;
   late RxList<LeaveListModel> viewLeaveListModelList =
       RxList<LeaveListModel>([]);
-  late RxBool _isLoading = true.obs;
+  late final RxBool _isLoading = true.obs;
 
   @override
   void initState() {
@@ -45,6 +43,7 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -77,11 +76,7 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
-                : viewLeaveListModelList.isEmpty
-                    ? const Center(
-                        child: Text('No Data Found!'),
-                      )
-                    : Column(
+                :  Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Container(
@@ -124,7 +119,7 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
                                       onChanged: (value) {
                                         _pendingAllSwitch.value = value;
                                         getLeaveListApiCall(
-                                            value == true ? '1' : '2');
+                                            value == false ? '1' : '2');
                                       },
                                       activeColor: Colors.yellow,
                                     ),
@@ -136,134 +131,101 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
                               ),
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: const [
-                                Text(
-                                  'Status',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                    fontSize: 16.0,
+                          Obx(()=>viewLeaveListModelList.isEmpty
+                              ? const Expanded(
+                            child: Center(child: Text('No Data Found!')),
+                          ) : Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: const [
+                                  Text(
+                                    'Status',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                      fontSize: 16.0,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  'From Date',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                    fontSize: 16.0,
+                                  Text(
+                                    'From Date',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                      fontSize: 16.0,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  'To Date',
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600,
+                                  Text(
+                                    'To Date',
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: 50,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  color: index % 2 == 0
-                                      ? Colors.red.shade100
-                                      : Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0,
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment:
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: viewLeaveListModelList.length,
+                                  itemBuilder: (context, index) {
+                                    return Container(
+                                      color: index % 2 == 0
+                                          ? Colors.red.shade100
+                                          : Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0,
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment:
                                         CrossAxisAlignment.center,
-                                    mainAxisAlignment:
+                                        mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        '${viewLeaveListModelList[index].Leave_Status}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black,
-                                          fontSize: 16.0,
-                                        ),
+                                        children: [
+                                          Text(
+                                            '${viewLeaveListModelList[index].Leave_Status}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black,
+                                              fontSize: 16.0,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${viewLeaveListModelList[index].From_date}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black,
+                                              fontSize: 16.0,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${viewLeaveListModelList[index].To_date}',
+                                            style: const TextStyle(
+                                              fontSize: 16.0,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        '${viewLeaveListModelList[index].From_date}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black,
-                                          fontSize: 16.0,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${viewLeaveListModelList[index].To_date}',
-                                        style: const TextStyle(
-                                          fontSize: 16.0,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                                    );
+                                  },
+                                ),
+                              ),],),
+                          )),
                         ],
                       ),
           ),
         ),
       ),
-      bottomSheet: Container(
-        color: CustomColor.colorPrimary,
-        child: Row(
-          children: [
-            SizedBox(
-              height: 45,
-              width: 45,
-              // margin: EdgeInsets.all(10),
-              child: Obx(
-                () => MyBadge(
-                  top: 6,
-                  right: 2,
-                  value: totalPenCount.toString(),
-                  child: Image.asset(
-                    "assets/images/edt_profile.png",
-                    scale: 2.5,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Text(
-                  "Employee Code: $_empCode",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Obx(
-                () => Text(
-                  NavigatorConstants.APP_VERSION.value.toString(),
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      bottomSheet:CommonBottomSheet(devicesize: deviceSize,),
     );
   }
 
@@ -272,12 +234,17 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
       viewLeaveListModelList.clear();
       _isLoading.value = true;
       final response = await http.get(Uri.parse(
-          '${ApiUrls.baseUrl}Get_leave_application_list?&emp_id=$_empId&RowsPerPage=1000&PageNumber=1&status=$status'));
-      if (response.statusCode == 200) {
+          '${ApiUrls.baseUrl}Get_leave_appliation_list?&emp_id=$_empId&RowsPerPage=1000&PageNumber=1&status=$status'));
+      // if (response.statusCode == 200) {
         viewLeaveListModelList.value = (json.decode(response.body) as List)
             .map((e) => LeaveListModel.fromJson(e))
             .toList();
-      }
+        // print(_empId);
+        if (kDebugMode) {
+          print(status);
+        }
+      // print(viewLeaveListModelList.value.length);
+      // }
       _isLoading.value = false;
     } catch (error) {
       _isLoading.value = false;
@@ -298,9 +265,7 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
   }
 
   void getPreferencesAndVersionInfo() async {
-    _empCode = sharedPreferences!.getString('emp_code') ?? "";
     _empId = sharedPreferences!.getString('emp_id') ?? "";
-    _userId = sharedPreferences!.getString('usrm_id') ?? "";
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     NavigatorConstants.APP_VERSION.value = packageInfo.version;
     getLeaveListApiCall('1');

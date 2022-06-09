@@ -33,7 +33,7 @@ class AddLeaveScreen extends StatefulWidget {
 class _AddLeaveScreenState extends State<AddLeaveScreen> {
   static const _redColor = CustomColor.colorPrimary;
 
-  final RxBool _isLoading = false.obs;
+   RxBool _isLoadingForSubmit = false.obs;
   bool _checkboxForEmergencyLeave = false;
   int groupValue = -1;
   String _fullName = "";
@@ -43,18 +43,15 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   String dateForFromDate = "";
   String timeForToDate = "";
   String timeForFromDate = "";
-  RxDouble calculatedDays = 1.0.obs;
- int  selectedLeaveTypeId=0;
+  int selectedLeaveTypeId = 0;
   DateTime firstDateOfToDate = DateTime.now();
   final TextEditingController _employeeNameController = TextEditingController();
-  final TextEditingController _leaveTypeController = TextEditingController();
   final TextEditingController _leaveBalanceController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
 
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _dayCountController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
-  final TextEditingController _reasonController = TextEditingController();
   final TextEditingController _addressWhileOnLeaveController =
       TextEditingController();
   final TextEditingController _contactWhileOnLeaveController =
@@ -65,7 +62,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   final RxInt _selectLeaveReasonDropDownPosition = 0.obs;
   final RxBool _isLeaveTypeLoading = true.obs;
   List<GetLeaveTypeAndReasonAndNoteStatusTwo>?
-      getleavetypeandreasonandnotestatustwo=[];
+      getleavetypeandreasonandnotestatustwo = [];
   GetLeaveTypeAndReasonAndNoteStatusThree?
       getleavetypeandreasonandnotestatusthree;
   GetEmployeeInOutTime? getEmployeeInOutTime;
@@ -79,17 +76,18 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   DateFormat dateFormat = DateFormat("dd/MM/yyyy ");
+
   @override
   void initState() {
-    _fromDateController.text ="${dateFormat.format(DateTime.now())} 9:00 AM";
-    _toDateController.text ="${dateFormat.format(DateTime.now())} 7:00 PM";
-    dateForToDate=dateFormat.format(DateTime.now());
-    dateForFromDate=dateFormat.format(DateTime.now());
+    _dayCountController.text = "1.0";
+    _fromDateController.text = "${dateFormat.format(DateTime.now())} 9:00 AM";
+    _toDateController.text = "${dateFormat.format(DateTime.now())} 7:00 PM";
+    dateForToDate = dateFormat.format(DateTime.now());
+    dateForFromDate = dateFormat.format(DateTime.now());
     timeForToDate = "7:00 PM";
     timeForFromDate = "9:00 AM";
     _prefs.then(
-
-          (prefsInstance) {
+      (prefsInstance) {
         sharedPreferences = prefsInstance;
         _fullName = sharedPreferences!.getString('FullName') ?? "";
         _employeeNameController.text = _fullName;
@@ -104,7 +102,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   @override
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
-   //HH:mm:ss
+    //HH:mm:ss
     return Scaffold(
       appBar: CommonAppBar(
         title: "Add Leave",
@@ -183,45 +181,55 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 25, top: 0,right: 25.0),
+                    padding:
+                        const EdgeInsets.only(left: 25, top: 0, right: 25.0),
                     child: DropdownButtonHideUnderline(
                       child: Obx(
-                            () => _isLeaveTypeLoading.value
-                            ? const CircularProgressIndicator(
-                          color: Colors.white,
-                        )
-                            : DropdownButton(
-                          value:
-                          _selectLeaveTypeDropDownPosition
-                              .value,
-                          onChanged: (position) {
-                            _selectLeaveTypeDropDownPosition
-                                .value = position as int;
-                            if(_selectLeaveTypeDropDownPosition.value > 0){
-                               selectedLeaveTypeId = getleavetypeandreasonandnotestatusone![_selectLeaveTypeDropDownPosition.value].id!;
-                              calculateLeaveBalance(selectedLeaveTypeId);
-
-                              //TODO API CALL For Leave Type Drop dow
-                            }
-                          },
-                          items: [
-                            ...getleavetypeandreasonandnotestatusone!
-                                .map(
-                                  (e) => DropdownMenuItem(
-                                value: e.position,
-                                child: Text(
-                                  '${e.ltmLeaveName}',
-                                  style: const TextStyle(
-                                    color: CustomColor
-                                        .colorPrimary,
-                                    fontSize: 13.0,
+                        () => _isLeaveTypeLoading.value
+                            ? const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 10),
+                                  child: Text(
+                                    "Loading...",
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
+                              )
+                            : DropdownButton(
+                                value: _selectLeaveTypeDropDownPosition.value,
+                                onChanged: (position) {
+                                  _selectLeaveTypeDropDownPosition.value =
+                                      position as int;
+                                  if (_selectLeaveTypeDropDownPosition.value >
+                                      0) {
+                                    selectedLeaveTypeId =
+                                        getleavetypeandreasonandnotestatusone![
+                                                _selectLeaveTypeDropDownPosition
+                                                    .value]
+                                            .id!;
+                                    calculateLeaveBalance(selectedLeaveTypeId);
+
+                                    //TODO API CALL For Leave Type Drop dow
+                                  }
+                                },
+                                items: [
+                                  ...getleavetypeandreasonandnotestatusone!
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.position,
+                                          child: Text(
+                                            '${e.ltmLeaveName}',
+                                            style: const TextStyle(
+                                              fontSize: 13.0,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ],
                               ),
-                            )
-                                .toList(),
-                          ],
-                        ),
                       ),
                     ),
                   ),
@@ -250,6 +258,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
+                      enabled: false,
                       cursorColor: CustomColor.colorPrimary,
                       controller: _leaveBalanceController,
                       decoration: const InputDecoration(
@@ -353,7 +362,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                               //TODO: handle selected date
                               if (selectedDate != null) {
                                 firstDateOfToDate = selectedDate;
-                                print(selectedDate);
+                                if (kDebugMode) {
+                                  print(selectedDate);
+                                }
                                 var sdate = dateFormat.format(selectedDate);
                                 dateForFromDate = sdate.toString();
                               } else {
@@ -368,7 +379,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                       minute: 00,
                                     )).then((selectedTime) {
                                   if (selectedTime != null) {
-                                    print(selectedTime.format(context));
+                                    if (kDebugMode) {
+                                      print(selectedTime.format(context));
+                                    }
                                     timeForFromDate =
                                         selectedTime.format(context);
                                     _fromDateController.text =
@@ -439,8 +452,12 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                             color: CustomColor.colorPrimary,
                           ),
                           onPressed: () {
-                            print("first date$firstDateOfToDate");
-                            print("init date${DateTime.now()}");
+                            if (kDebugMode) {
+                              print("first date$firstDateOfToDate");
+                            }
+                            if (kDebugMode) {
+                              print("init date${DateTime.now()}");
+                            }
                             showDatePicker(
                                 context: context,
                                 initialDate: DateTime.now(),
@@ -464,7 +481,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 }).then((selectedDate) {
                               //TODO: handle selected date
                               if (selectedDate != null) {
-                                print(selectedDate);
+                                if (kDebugMode) {
+                                  print(selectedDate);
+                                }
                                 var sdate = dateFormat.format(selectedDate);
                                 dateForToDate = sdate.toString();
                               } else {
@@ -479,7 +498,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                       minute: 00,
                                     )).then((selectedTime) {
                                   if (selectedTime != null) {
-                                    print(selectedTime.format(context));
+                                    if (kDebugMode) {
+                                      print(selectedTime.format(context));
+                                    }
                                     timeForToDate =
                                         selectedTime.format(context);
                                     _toDateController.text =
@@ -523,14 +544,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   ),
                   Padding(
                       padding: const EdgeInsets.only(left: 25, top: 3),
-                      child: Obx(
-                        () => TextField(
+                      child: TextField(
                           enabled: false,
                           cursorColor: CustomColor.colorPrimary,
                           controller: _dayCountController,
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: calculatedDays.value.toString(),
+
                             // enabledBorder: InputBorder.none,
                             // errorBorder: InputBorder.none,
                             // focusedBorder: InputBorder.none,
@@ -543,7 +563,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           ),
                           keyboardType: TextInputType.name,
                         ),
-                      )),
+                      ),
                 ],
               ),
             ), //Day
@@ -610,53 +630,60 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         textAlign: TextAlign.start,
                       )),
                   Padding(
-                    padding: const EdgeInsets.only(left: 25, top: 3,right: 25),
-                      child: DropdownButtonHideUnderline(
-                              child: Obx(
-                                    () => _isLeaveTypeLoading.value
-                                    ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                                    : DropdownButton(
-                                  value:
-                                    _selectLeaveReasonDropDownPosition
-                                      .value,
-                                  onChanged: (position) {
-                                    _selectLeaveReasonDropDownPosition
-                                        .value = position as int;
-                                    if(_selectLeaveReasonDropDownPosition.value > 0){
-                                      int selectedLeaveTypeId = getleavetypeandreasonandnotestatustwo![_selectLeaveReasonDropDownPosition.value].ebdValue!;
-                                      //TODO API CALL For Leave Type Drop dow
-                                    }
-                                  },
-                                  items: [
-                                    ...getleavetypeandreasonandnotestatustwo!
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                        value: e.position,
-                                        child: Text(
-                                          '${e.ebdName}',
-                                          style: const TextStyle(
-                                            color: CustomColor
-                                                .colorPrimary,
-                                            fontSize: 13.0,
+                    padding: const EdgeInsets.only(left: 25, top: 3, right: 25),
+                    child: DropdownButtonHideUnderline(
+                      child: Obx(
+                        () => _isLeaveTypeLoading.value
+                            ? const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 10),
+                                  child: Text(
+                                    "Loading...",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              )
+                            : DropdownButton(
+                                value: _selectLeaveReasonDropDownPosition.value,
+                                onChanged: (position) {
+                                  _selectLeaveReasonDropDownPosition.value =
+                                      position as int;
+                                  if (_selectLeaveReasonDropDownPosition.value >
+                                      0) {
+                                    // int selectedLeaveTypeId =
+                                    //     getleavetypeandreasonandnotestatustwo![
+                                    //             _selectLeaveReasonDropDownPosition
+                                    //                 .value]
+                                    //         .ebdValue!;
+                                    //TODO API CALL For Leave Type Drop down
+                                  }
+                                },
+                                items: [
+                                  ...getleavetypeandreasonandnotestatustwo!
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.position,
+                                          child: Text(
+                                            '${e.ebdName}',
+                                            style: const TextStyle(
+                                              fontSize: 13.0,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    )
-                                        .toList(),
-                                  ],
-                                ),
+                                      )
+                                      .toList(),
+                                ],
                               ),
-
-
+                      ),
                     ),
                   ),
                 ],
               ),
             ), //Reason
             Container(
-              height: deviceSize.height*0.20,
+              height: deviceSize.height * 0.20,
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -806,18 +833,18 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   }),
             ), //radio 3
             Padding(
-              padding: EdgeInsets.only(left: 20.0),
+              padding: const EdgeInsets.only(left: 20.0),
               child: SizedBox(
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 45),
+                  padding: const EdgeInsets.only(bottom: 45),
                   child: Obx(
                     () => _isLeaveTypeLoading.value
-                        ? CircularProgressIndicator(
+                        ? const CircularProgressIndicator(
                             color: Colors.white,
                           )
                         : Text(
                             "Note:- ${getleavetypeandreasonandnotestatusthree!.notes}",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                   ),
@@ -827,7 +854,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Container(
+                SizedBox(
                   width: deviceSize.width * 0.40,
                   height: deviceSize.width * 0.10,
                   child: ElevatedButton(
@@ -843,43 +870,44 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                       ),
                     ),
                     onPressed: () {
-                      if(_selectLeaveTypeDropDownPosition.value ==0){
+                     _isLoadingForSubmit.value = true;
+                      if (_selectLeaveTypeDropDownPosition.value == 0) {
+                        _isLoadingForSubmit.value = false;
+
                         _showToast(msg: "please select leave type");
                         return;
-                      }//select leave type
-                      if(_remarkController.text.isEmpty){
+                      } //select leave type
+                      if (_remarkController.text.isEmpty) {
+                        _isLoadingForSubmit.value = false;
+
                         _showToast(msg: "please enter remark");
-                      return;
-                      }//enter remarks
-                      if(_selectLeaveReasonDropDownPosition.value ==0 ){
+                        return;
+                      } //enter remarks
+                      if (_selectLeaveReasonDropDownPosition.value == 0) {
+                        _isLoadingForSubmit.value = false;
+
                         _showToast(msg: "please select reason type");
-                      return;
+                        return;
                       }
                       addLeaveApiCall();
+                      _isLoadingForSubmit.value = false;
+
                     },
                     child: Obx(
-                      () => _isLoading.value
-                          ? GestureDetector(
-                        onTap: (){
-
-                          //select reason
-                        },
-                            child: const SizedBox(
+                      () => _isLoadingForSubmit.value
+                          ? const SizedBox(
                                 height: 15,
                                 width: 15,
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.0,
-                                ),
-                              ),
-                          )
+
+                                ),)
                           : const Text(
                               "Submit",
                             ),
                     ),
                   ),
                 ), //Submit
-                Container(
+                SizedBox(
                   width: deviceSize.width * 0.40,
                   height: deviceSize.width * 0.10,
                   child: ElevatedButton(
@@ -905,18 +933,8 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Obx(
-                      () => _isLoading.value
-                          ? const SizedBox(
-                              height: 15,
-                              width: 15,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.0,
-                              ),
-                            )
-                          : const Text("Cancel"),
-                    ),
+                    child: const Text("Cancel"),
+
                   ),
                 ), //Cancel
               ],
@@ -939,29 +957,36 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         if (response.statusCode == 200) {
           if (i == 1) {
             getleavetypeandreasonandnotestatusone!.clear();
-            getleavetypeandreasonandnotestatusone!.add(GetLeaveTypeAndReasonAndNoteStatusOne(position: 0,id: -1,ltmLeaveName: 'Select Leave Type'));
-            getleavetypeandreasonandnotestatusone!.addAll((json.decode(response.body)
-            as List)
+            getleavetypeandreasonandnotestatusone!.add(
+                GetLeaveTypeAndReasonAndNoteStatusOne(
+                    position: 0, id: -1, ltmLeaveName: 'Select Leave Type'));
+            getleavetypeandreasonandnotestatusone!.addAll((json
+                    .decode(response.body) as List)
                 .map((e) => GetLeaveTypeAndReasonAndNoteStatusOne.fromJson(e))
                 .toList());
 
-            for(int  i = 1 ; i < getleavetypeandreasonandnotestatusone!.length; i ++){
+            for (int i = 1;
+                i < getleavetypeandreasonandnotestatusone!.length;
+                i++) {
               getleavetypeandreasonandnotestatusone![i].position = i;
             }
 
             // addDataToLists();
           } else if (i == 2) {
             getleavetypeandreasonandnotestatustwo!.clear();
-            getleavetypeandreasonandnotestatustwo!.add(GetLeaveTypeAndReasonAndNoteStatusTwo(position: 0,ebdValue: -1,ebdName: 'Select Reason'));
-            getleavetypeandreasonandnotestatustwo!.addAll((json.decode(response.body)
-            as List)
+            getleavetypeandreasonandnotestatustwo!.add(
+                GetLeaveTypeAndReasonAndNoteStatusTwo(
+                    position: 0, ebdValue: -1, ebdName: 'Select Reason'));
+            getleavetypeandreasonandnotestatustwo!.addAll((json
+                    .decode(response.body) as List)
                 .map((e) => GetLeaveTypeAndReasonAndNoteStatusTwo.fromJson(e))
                 .toList());
 
-            for(int  i = 1 ; i < getleavetypeandreasonandnotestatustwo!.length; i ++){
+            for (int i = 1;
+                i < getleavetypeandreasonandnotestatustwo!.length;
+                i++) {
               getleavetypeandreasonandnotestatustwo![i].position = i;
             }
-
           } else {
             getleavetypeandreasonandnotestatusthree = (json
                     .decode(response.body) as List)
@@ -1011,24 +1036,29 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
 
   calculateLeaveDaysApiCall(String fromDate, String toDate) async {
     try {
-      print(fromDate);
-      print(toDate);
-      final response = await http.get(Uri.parse(
-          '${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=120'));
-      // print('${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId');
       if (kDebugMode) {
-        // print(_empId);
+        print(fromDate);
       }
+      if (kDebugMode) {
+        print(toDate);
+      }
+      final response = await http.get(Uri.parse(
+          '${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId'));
+      print('${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId');
+
       if (response.statusCode == 200) {
         getEmployeeLeaveDays = (json.decode(response.body) as List)
             .map((e) => GetEmployeeLeaveDays.fromJson(e))
             .toList()
             .first;
-        calculatedDays.value = double.parse(getEmployeeLeaveDays!.days!);
-        print("calculated days ${calculatedDays.value}");
-        //print(getEmployeeLeaveDays!.msg);
-        calculatedDays.value = double.parse(getEmployeeLeaveDays!.days!);
-        print(calculatedDays.value);
+        if(getEmployeeLeaveDays!.msg == "From date can not be greater than to date"){
+          return;
+        }
+        if(getEmployeeLeaveDays!.msg ==""){
+          return;
+        }
+          print(getEmployeeLeaveDays!.days!);
+          _dayCountController.text = getEmployeeLeaveDays!.days!;
       } else {
         return "something Went Wrong please try again later";
       }
@@ -1041,22 +1071,22 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
     }
   } //Get_Employee_Leave_Days
 
-  addLeaveApiCall(
-      {leaveId,
-      leaveType,
-      fromDate,
-      toDate,
-      remark,
-      reasonId,
-      loadAdjustId,
-      leaveDays,
-      }) async {
+  addLeaveApiCall({
+    leaveId,
+    leaveType,
+    fromDate,
+    toDate,
+    remark,
+    reasonId,
+    loadAdjustId,
+    leaveDays,
+  }) async {
     try {
-      String _isEmergency="0";
-      if(_checkboxForEmergencyLeave==true){
-        _isEmergency ="1";
+      _isLoadingForSubmit.value = true;
+      String isEmergency = "0";
+      if (_checkboxForEmergencyLeave == true) {
+        isEmergency = "1";
       }
-      String ipAddress ="1";
       final response = await http.get(Uri.parse(
           //"&leave_id=" + leave_IDD + "&emp_id=" + mySharedPrefereces.getEmpID() + "&leave_type=" + leave_ID +
           // "&from_date=" + IN_date_time + "&to_date=" + Out_date_time + "&remark=" + edtremark.getText().toString().trim()
@@ -1065,24 +1095,27 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
           // "&emergency_leave=" + is_emergency + "&user_id=" + mySharedPrefereces.getUserID() +
           // "&ip_address=" + "1" + "&leave_balance=" + edtleavebalance.getText().toString().trim() + ""
 
-         // http://iipl.iipl.info/ierphr.asmx/Employee_leave_application_insert?&leave_id=0&emp_id=138&leave_type=4&from_date=09/06/2022%2012:00:00&to_date=25/06/2022%2012:00:00&remark=test1234&reason=2&load_adjusted=1&address_while_on_leave=&contact_no=&leave_days=1.0&emergency_leave=1&user_id=246&ip_address=1&leave_balance=0
+          // http://iipl.iipl.info/ierphr.asmx/Employee_leave_application_insert?&leave_id=0&emp_id=138&leave_type=4&from_date=09/06/2022%2012:00:00&to_date=25/06/2022%2012:00:00&remark=test1234&reason=2&load_adjusted=1&address_while_on_leave=&contact_no=&leave_days=1.0&emergency_leave=1&user_id=246&ip_address=1&leave_balance=0
 
           //empid,user id find from sharedpreference,ip address=1,
 
-
-          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=0&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$_isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}'));
-    print(          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=0&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted="1"&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$_isEmergency&user_id=$_userId&ip_address=${ipAddress}&leave_balance=${_leaveBalanceController.text}'
-    );
-
-     if (kDebugMode) {}
+          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=0&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}'));
+        print(
+            '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=0&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}');
       if (response.statusCode == 200) {
         insertLeave = (json.decode(response.body) as List)
             .map((e) => InertLeave.fromJson(e))
             .toList()
             .first;
         _showToast(msg: insertLeave!.msg!);
+        print(insertLeave!.msg!);
+        if(insertLeave!.msg =="Leave Appliation Inserted"){
+          _isLoadingForSubmit.value = false;
+          Navigator.pop(context);
+        }
       } else {
-        print("notworking");
+        _isLoadingForSubmit.value = false;
+
         return "something Went Wrong please try again later";
       }
     } catch (error) {
@@ -1090,6 +1123,8 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       if (kDebugMode) {
         print(error.toString());
       }
+      _isLoadingForSubmit.value = false;
+
     }
   } //Employee_leave_application_insert
 
@@ -1148,10 +1183,10 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             .map((e) => EmployeeLeaveBalanceModel.fromJson(e))
             .toList()
             .first;
-
       }
       if (response.statusCode == 200) {
-          _leaveBalanceController.text= employeeLeaveBalanceModel!.balance.toString();
+        _leaveBalanceController.text =
+            employeeLeaveBalanceModel!.balance.toString();
       } else {
         _showToast(msg: 'something Went Wrong please try again later');
       }
@@ -1187,7 +1222,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
     }
   } //Apply_Cancel_Leave_application
 
-  void ApplyCancelLeaveMailSend(String id) async {
+  void applyCancelLeaveMailSend(String id) async {
     try {
       final response = await http.get(Uri.parse(
           '${ApiUrls.baseUrl}Apply_Cancel_Leave_application?&id=$id'));
@@ -1209,14 +1244,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       }
     }
   } //Apply_Cancel_Leave_application
-
-  //
-  // addDataToLists(){
-  //   for(int i=1;i<getleavetypeandreasonandnotestatusone!.length - 1 ;i++){
-  //     _LeaveType.add(getleavetypeandreasonandnotestatusone![i].ltmLeaveName!);
-  //   }
-  // }
-  //
 
   void _showToast({required String msg}) {
     Fluttertoast.showToast(

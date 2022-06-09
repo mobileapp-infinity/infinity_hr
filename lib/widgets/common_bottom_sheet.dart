@@ -5,7 +5,7 @@ import 'package:infinity_hr/utils/navigator_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonBottomSheet extends StatefulWidget {
-  CommonBottomSheet({super.key, deviceSize, required this.devicesize});
+  CommonBottomSheet({super.key, required this.devicesize});
 
   Size devicesize;
 
@@ -58,6 +58,7 @@ String empName = "";
           (prefsInstance) {
         sharedPreferences = prefsInstance;
         empName = sharedPreferences!.getString('emp_code') ?? "";
+        setState((){});
       },
     );
   }
