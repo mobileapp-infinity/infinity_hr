@@ -16,6 +16,7 @@ import 'package:infinity_hr/models/getleavetypeandreasonandnotestatusone.dart';
 import 'package:infinity_hr/models/getleavetypeandreasonandnotestatusthree.dart';
 import 'package:infinity_hr/models/getleavetypeandreasonandnotestatustwo.dart';
 import 'package:infinity_hr/models/insert_leave.dart';
+import 'package:infinity_hr/screens/view_leave_page.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/widgets/common_appbar.dart';
 import 'package:infinity_hr/widgets/common_bottom_sheet.dart';
@@ -24,7 +25,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 class AddLeaveScreen extends StatefulWidget {
-  const AddLeaveScreen({Key? key}) : super(key: key);
+  AddLeaveScreen({
+    super.key,
+    required id,
+    required status,
+    required isupdate,
+  }) {
+    this._ID = id;
+    this._STATUS = status;
+    this._ISUPDATE = isupdate;
+  }
+
+  String _ID = "", _STATUS = "";
+  bool _ISUPDATE = false;
 
   @override
   State<AddLeaveScreen> createState() => _AddLeaveScreenState();
@@ -33,7 +46,8 @@ class AddLeaveScreen extends StatefulWidget {
 class _AddLeaveScreenState extends State<AddLeaveScreen> {
   static const _redColor = CustomColor.colorPrimary;
 
-   RxBool _isLoadingForSubmit = false.obs;
+  RxBool _isLoadingForSubmit = false.obs;
+  RxBool _isLoadingForUpdate = false.obs;
   bool _checkboxForEmergencyLeave = false;
   int groupValue = -1;
   String _fullName = "";
@@ -58,6 +72,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       TextEditingController();
   List<GetLeaveTypeAndReasonAndNoteStatusOne>?
       getleavetypeandreasonandnotestatusone = [];
+
   final RxInt _selectLeaveTypeDropDownPosition = 0.obs;
   final RxInt _selectLeaveReasonDropDownPosition = 0.obs;
   final RxBool _isLeaveTypeLoading = true.obs;
@@ -76,6 +91,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   DateFormat dateFormat = DateFormat("dd/MM/yyyy ");
+  RxBool _isNeedToShowUpdateDeleteButton = true.obs;
 
   @override
   void initState() {
@@ -95,9 +111,57 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         _empId = sharedPreferences!.getString('emp_id') ?? "";
       },
     );
-    getLeaveTypeAndReasonAndNoteApiCall();
+    getLeaveTypeAndReasonAndNoteApiCall().then((value) {
+      if (widget._ISUPDATE) {
+        editLeaveDataApiCall(widget._ID).then((value) {
+          _remarkController.text = leaveDetail!.elaReason!;
+          getleavetypeandreasonandnotestatusone!.forEach((element) {
+            if(element.id== leaveDetail!.elaLeaveTypeId as int){
+              _selectLeaveTypeDropDownPosition.value=  element.position;
+            }
+          });
+          getleavetypeandreasonandnotestatustwo!.forEach((element) {
+            if(element.ebdValue== leaveDetail!.elaLeaveReason as int){
+              _selectLeaveReasonDropDownPosition.value=  element.position;
+            }
+          });
+
+          // _selectLeaveTypeDropDownPosition.value =
+          // leaveDetail!.elaLeaveTypeId as int;
+          // _selectLeaveReasonDropDownPosition.value =
+          // leaveDetail!.elaLeaveReason as int;
+          _leaveBalanceController.text = leaveDetail!.leaveBalance.toString();
+          _fromDateController.text = leaveDetail!.elaFromDnt.toString();
+          _toDateController.text = leaveDetail!.elaToDnt.toString();
+          _dayCountController.text = leaveDetail!.elaDays.toString();
+          _addressWhileOnLeaveController.text =
+              leaveDetail!.elaAddressWhileOnLeave.toString();
+          _contactWhileOnLeaveController.text =
+              leaveDetail!.elaContactNo.toString();
+          if (leaveDetail!.elaEmergencyLeave == 1) {
+            _checkboxForEmergencyLeave = true;
+          } else {
+            _checkboxForEmergencyLeave = false;
+          }
+          if (leaveDetail!.elaLoadAdjusted == 1) {
+            groupValue = 1;
+          } else if (leaveDetail!.elaLoadAdjusted == 2) {
+            groupValue = 2;
+          } else {
+            groupValue = 0;
+          }
+          setState(() {});
+        });
+      }
+    }
+
+    );
+
+
     super.initState();
   }
+
+  rebuildwidget() {}
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +179,190 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            widget._ISUPDATE
+                ? Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: deviceSize.width * 0.05),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(
+                          width: deviceSize.width * 0.40,
+                          height: deviceSize.width * 0.10,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              backgroundColor:
+                                  MaterialStateProperty.all<Color>(_redColor),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              _isLoadingForUpdate.value = true;
+                              if (_selectLeaveTypeDropDownPosition.value == 0) {
+                                _isLoadingForUpdate.value = false;
+
+                                _showToast(msg: "please select leave type");
+                                return;
+                              } //select leave type
+                              if (_remarkController.text.isEmpty) {
+                                _isLoadingForUpdate.value = false;
+
+                                _showToast(msg: "please enter remark");
+                                return;
+                              } //enter remarks
+                              if (_selectLeaveReasonDropDownPosition.value == 0) {
+                                _isLoadingForUpdate.value = false;
+
+                                _showToast(msg: "please select reason type");
+                                return;
+                              }
+                              addLeaveApiCall();
+                              _isLoadingForUpdate.value = false;
+                            },
+                            child: Obx(
+                              () => _isLoadingForUpdate.value
+                                  ? const SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : const Text(
+                                      "Update",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                            ),
+                          ),
+                        ), //Submit
+                        SizedBox(
+                          width: deviceSize.width * 0.40,
+                          height: deviceSize.width * 0.10,
+                          child: ElevatedButton(
+                              child: const Text(
+                                "Delete",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              style: ButtonStyle(
+                                elevation: MaterialStateProperty.all(0),
+                                side: MaterialStateProperty.all(
+                                  const BorderSide(
+                                    style: BorderStyle.solid,
+                                    color: Colors.black26,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.black),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    // title: Text("Alert Dialog Box",style: TextStyle(backgroundColor: Colors.red)),
+                                    //actionsPadding: EdgeInsets.only(left: 10),
+                                    title: Container(
+                                      height: deviceSize.height * 0.05,
+                                      color: CustomColor.colorPrimary,
+                                      child: const Center(
+                                        child: Text(
+                                          "INFINITY",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    // contentPadding: EdgeInsets.all(25),
+                                    content: const Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 20),
+                                        child: Text("Are You Sure To Delete?")),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          side: MaterialStateProperty.all(
+                                            const BorderSide(
+                                              style: BorderStyle.solid,
+                                              color: CustomColor.colorPrimary,
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          foregroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  CustomColor.colorPrimary),
+                                          backgroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  Colors.white),
+                                          shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          "Cancel",
+                                          style: TextStyle(),
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          foregroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  Colors.white),
+                                          backgroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  _redColor),
+                                          shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          deleteLeaveApiCall(widget._ID)
+                                              .then((value) =>
+                                                  _showToast(msg: value))
+                                              .then((value) =>
+                                                  Navigator.of(context)
+                                                      .popUntil((route) =>
+                                                          route.isFirst));
+                                        },
+                                        child: const Text(
+                                          "OK",
+                                          style: TextStyle(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(),
+
             Container(
               margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               decoration: BoxDecoration(
@@ -543,27 +791,27 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     ),
                   ),
                   Padding(
-                      padding: const EdgeInsets.only(left: 25, top: 3),
-                      child: TextField(
-                          enabled: false,
-                          cursorColor: CustomColor.colorPrimary,
-                          controller: _dayCountController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
+                    padding: const EdgeInsets.only(left: 25, top: 3),
+                    child: TextField(
+                      enabled: false,
+                      cursorColor: CustomColor.colorPrimary,
+                      controller: _dayCountController,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
 
-                            // enabledBorder: InputBorder.none,
-                            // errorBorder: InputBorder.none,
-                            // focusedBorder: InputBorder.none,
-                            // focusedErrorBorder: InputBorder.none,
-                            // prefixIcon: Image.asset("assets/images/envelop.png"),
-                            hintStyle: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          keyboardType: TextInputType.name,
+                        // enabledBorder: InputBorder.none,
+                        // errorBorder: InputBorder.none,
+                        // focusedBorder: InputBorder.none,
+                        // focusedErrorBorder: InputBorder.none,
+                        // prefixIcon: Image.asset("assets/images/envelop.png"),
+                        hintStyle: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
                         ),
                       ),
+                      keyboardType: TextInputType.name,
+                    ),
+                  ),
                 ],
               ),
             ), //Day
@@ -693,15 +941,16 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                      padding: EdgeInsets.only(
-                          left: deviceSize.width * 0.06,
-                          top: deviceSize.height * 0.010),
-                      child: const Text(
-                        "Address While on Leave",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                        textAlign: TextAlign.start,
-                      )),
+                    padding: EdgeInsets.only(
+                        left: deviceSize.width * 0.06,
+                        top: deviceSize.height * 0.010),
+                    child: const Text(
+                      "Address While on Leave",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
@@ -851,94 +1100,95 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 ),
               ), //Note:-)
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                  width: deviceSize.width * 0.40,
-                  height: deviceSize.width * 0.10,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(_redColor),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                     _isLoadingForSubmit.value = true;
-                      if (_selectLeaveTypeDropDownPosition.value == 0) {
-                        _isLoadingForSubmit.value = false;
-
-                        _showToast(msg: "please select leave type");
-                        return;
-                      } //select leave type
-                      if (_remarkController.text.isEmpty) {
-                        _isLoadingForSubmit.value = false;
-
-                        _showToast(msg: "please enter remark");
-                        return;
-                      } //enter remarks
-                      if (_selectLeaveReasonDropDownPosition.value == 0) {
-                        _isLoadingForSubmit.value = false;
-
-                        _showToast(msg: "please select reason type");
-                        return;
-                      }
-                      addLeaveApiCall();
-                      _isLoadingForSubmit.value = false;
-
-                    },
-                    child: Obx(
-                      () => _isLoadingForSubmit.value
-                          ? const SizedBox(
-                                height: 15,
-                                width: 15,
-                                child: CircularProgressIndicator(
-
-                                ),)
-                          : const Text(
-                              "Submit",
+            !widget._ISUPDATE
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SizedBox(
+                        width: deviceSize.width * 0.40,
+                        height: deviceSize.width * 0.10,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(_redColor),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
-                    ),
-                  ),
-                ), //Submit
-                SizedBox(
-                  width: deviceSize.width * 0.40,
-                  height: deviceSize.width * 0.10,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      elevation: MaterialStateProperty.all(0),
-                      side: MaterialStateProperty.all(
-                        const BorderSide(
-                          style: BorderStyle.solid,
-                          color: Colors.black26,
-                          width: 1.0,
-                        ),
-                      ),
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(_redColor),
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("Cancel"),
+                          ),
+                          onPressed: () {
+                            _isLoadingForSubmit.value = true;
+                            if (_selectLeaveTypeDropDownPosition.value == 0) {
+                              _isLoadingForSubmit.value = false;
 
-                  ),
-                ), //Cancel
-              ],
-            ),
+                              _showToast(msg: "please select leave type");
+                              return;
+                            } //select leave type
+                            if (_remarkController.text.isEmpty) {
+                              _isLoadingForSubmit.value = false;
+
+                              _showToast(msg: "please enter remark");
+                              return;
+                            } //enter remarks
+                            if (_selectLeaveReasonDropDownPosition.value == 0) {
+                              _isLoadingForSubmit.value = false;
+
+                              _showToast(msg: "please select reason type");
+                              return;
+                            }
+                            addLeaveApiCall();
+                            _isLoadingForSubmit.value = false;
+                          },
+                          child: Obx(
+                            () => _isLoadingForSubmit.value
+                                ? const SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : const Text(
+                                    "Submit",
+                                  ),
+                          ),
+                        ),
+                      ), //Submit
+                      SizedBox(
+                        width: deviceSize.width * 0.40,
+                        height: deviceSize.width * 0.10,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            elevation: MaterialStateProperty.all(0),
+                            side: MaterialStateProperty.all(
+                              const BorderSide(
+                                style: BorderStyle.solid,
+                                color: Colors.black26,
+                                width: 1.0,
+                              ),
+                            ),
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(_redColor),
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                      ), //Cancel
+                    ],
+                  )
+                : const SizedBox(),
             SizedBox(
               height: deviceSize.height * 0.08,
             )
@@ -948,7 +1198,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
     );
   }
 
-  getLeaveTypeAndReasonAndNoteApiCall() async {
+  Future<void> getLeaveTypeAndReasonAndNoteApiCall() async {
     for (int i = 1; i <= 3; i++) {
       try {
         final response = await http.get(Uri.parse(
@@ -1044,21 +1294,23 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       }
       final response = await http.get(Uri.parse(
           '${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId'));
-      print('${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId');
+      print(
+          '${ApiUrls.baseUrl}Get_Employee_Leave_Days?&from_date=$fromDate&to_date=$toDate&empid=$_empId');
 
       if (response.statusCode == 200) {
         getEmployeeLeaveDays = (json.decode(response.body) as List)
             .map((e) => GetEmployeeLeaveDays.fromJson(e))
             .toList()
             .first;
-        if(getEmployeeLeaveDays!.msg == "From date can not be greater than to date"){
+        if (getEmployeeLeaveDays!.msg ==
+            "From date can not be greater than to date") {
           return;
         }
-        if(getEmployeeLeaveDays!.msg ==""){
+        if (getEmployeeLeaveDays!.msg == "") {
           return;
         }
-          print(getEmployeeLeaveDays!.days!);
-          _dayCountController.text = getEmployeeLeaveDays!.days!;
+        print(getEmployeeLeaveDays!.days!);
+        _dayCountController.text = getEmployeeLeaveDays!.days!;
       } else {
         return "something Went Wrong please try again later";
       }
@@ -1071,22 +1323,21 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
     }
   } //Get_Employee_Leave_Days
 
-  addLeaveApiCall({
-    leaveId,
-    leaveType,
-    fromDate,
-    toDate,
-    remark,
-    reasonId,
-    loadAdjustId,
-    leaveDays,
-  }) async {
+  addLeaveApiCall() async {
     try {
+      String isEmergency;
       _isLoadingForSubmit.value = true;
-      String isEmergency = "0";
+      isEmergency = "0";
       if (_checkboxForEmergencyLeave == true) {
         isEmergency = "1";
       }
+      String leaveId;
+      if (widget._ISUPDATE) {
+        leaveId = widget._ID;
+      } else {
+        leaveId = '0';
+      }
+
       final response = await http.get(Uri.parse(
           //"&leave_id=" + leave_IDD + "&emp_id=" + mySharedPrefereces.getEmpID() + "&leave_type=" + leave_ID +
           // "&from_date=" + IN_date_time + "&to_date=" + Out_date_time + "&remark=" + edtremark.getText().toString().trim()
@@ -1099,9 +1350,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
 
           //empid,user id find from sharedpreference,ip address=1,
 
-          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=0&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}'));
-        print(
-            '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=0&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}');
+          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=$leaveId&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}'));
+      print(
+          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=$leaveId&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}');
       if (response.statusCode == 200) {
         insertLeave = (json.decode(response.body) as List)
             .map((e) => InertLeave.fromJson(e))
@@ -1109,7 +1360,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             .first;
         _showToast(msg: insertLeave!.msg!);
         print(insertLeave!.msg!);
-        if(insertLeave!.msg =="Leave Appliation Inserted"){
+        if (insertLeave!.msg == "Leave Appliation Inserted") {
           _isLoadingForSubmit.value = false;
           Navigator.pop(context);
         }
@@ -1124,22 +1375,21 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
         print(error.toString());
       }
       _isLoadingForSubmit.value = false;
-
     }
   } //Employee_leave_application_insert
 
-  deleteLeaveApiCall(String id) async {
+  Future<String> deleteLeaveApiCall(String id) async {
     try {
       final response = await http.get(Uri.parse(
           '${ApiUrls.baseUrl}employee_leave_application_mst_delete?&id=$id&user_id=$_userId&empid=$_empId&ip="1"'));
-      if (kDebugMode) {
-        deleteLeave = (json.decode(response.body) as List)
-            .map((e) => DeleteLeave.fromJson(e))
-            .toList()
-            .first;
-        _showToast(msg: deleteLeave!.msg.toString());
-      }
+      deleteLeave = (json.decode(response.body) as List)
+          .map((e) => DeleteLeave.fromJson(e))
+          .toList()
+          .first;
+      // _showToast(msg: deleteLeave!.msg.toString());
+
       if (response.statusCode == 200) {
+        return deleteLeave!.msg.toString();
       } else {
         return "something Went Wrong please try again later";
       }
@@ -1148,10 +1398,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       if (kDebugMode) {
         print(error.toString());
       }
+      return "please try again later";
     }
   } //employee_leave_application_mst_delete
 
-  getLeaveDetailApiCall(String id) async {
+  Future<void> editLeaveDataApiCall(String id) async {
     try {
       final response = await http
           .get(Uri.parse('${ApiUrls.baseUrl}Get_leave_detail?&id=$id'));
@@ -1162,7 +1413,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             .first;
       }
       if (response.statusCode == 200) {
-        _showToast(msg: leaveDetail!.id.toString());
+        _showToast(msg: leaveDetail!.elaReason.toString());
       } else {
         _showToast(msg: 'something Went Wrong please try again later');
       }
@@ -1225,7 +1476,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   void applyCancelLeaveMailSend(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          '${ApiUrls.baseUrl}Apply_Cancel_Leave_application?&id=$id'));
+          '${ApiUrls.baseUrl}Apply_Cancel_Leave_application_mail?&id=$id'));
       if (kDebugMode) {
         cancelLeaveMail = (json.decode(response.body) as List)
             .map((e) => CancelLeaveMail.fromJson(e))

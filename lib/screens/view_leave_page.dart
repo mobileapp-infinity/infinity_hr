@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:infinity_hr/api/api_urls.dart';
 import 'package:infinity_hr/models/employee_leave_balance_model.dart';
+import 'package:infinity_hr/screens/add_leave_screen.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/utils/navigator_constants.dart';
 import 'package:infinity_hr/widgets/common_bottom_sheet.dart';
@@ -183,43 +184,50 @@ class _ViewLeaveScreenState extends State<ViewLeaveScreen> {
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 8.0,
                                       ),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Text(
-                                            '${viewLeaveListModelList[index].Leave_Status}',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black,
-                                              fontSize: 16.0,
+                                      child: GestureDetector(
+                                        onTap: (){
+                                          print("leave id:- ${viewLeaveListModelList[index].id}");
+                                          print("leave status:- ${viewLeaveListModelList[index].Leave_Status}");
+                                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddLeaveScreen(id: viewLeaveListModelList[index].id.toString(), status: viewLeaveListModelList[index].Leave_Status, isupdate: true)));
+                                        },
+                                        child: Row(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              '${viewLeaveListModelList[index].Leave_Status}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black,
+                                                fontSize: 16.0,
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            '${viewLeaveListModelList[index].From_date}',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black,
-                                              fontSize: 16.0,
+                                            Text(
+                                              '${viewLeaveListModelList[index].From_date}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black,
+                                                fontSize: 16.0,
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            '${viewLeaveListModelList[index].To_date}',
-                                            style: const TextStyle(
-                                              fontSize: 16.0,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600,
+                                            Text(
+                                              '${viewLeaveListModelList[index].To_date}',
+                                              style: const TextStyle(
+                                                fontSize: 16.0,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     );
                                   },
                                 ),
                               ),],),
-                          )),
+                          ),  ),
                         ],
                       ),
           ),

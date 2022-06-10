@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:infinity_hr/screens/add_leave_screen.dart';
 import 'package:infinity_hr/screens/change_password_screen.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 import 'package:infinity_hr/screens/login_screen.dart';
+import 'package:infinity_hr/screens/view_leave_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatefulWidget {
@@ -89,6 +91,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               onTap: () {
                 widget.onDrawerMenuSelected(DrawerMenuEnum.viewLeaves);
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ViewLeaveScreen()));
+
               },
             ),
           ),
@@ -118,6 +122,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               onTap: () {
                 widget.onDrawerMenuSelected(DrawerMenuEnum.addLeave);
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddLeaveScreen(id: "",isupdate: false,status: "",)));
+
               },
             ),
           ),

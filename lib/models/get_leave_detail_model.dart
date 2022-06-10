@@ -1,58 +1,80 @@
 class LeaveDetail {
-  String? id;
-  String? Leave_Status;
-  String? ela_is_approve_value;
-  String? ela_emp_id;
-  String? ela_emp_name;
-  String? ela_leave_type_id;
-  String? leave_balance;
-  String? ela_from_dnt;
-  String? ela_to_dnt;
-  String? ela_days;
-  String? ela_reason;
-  String? ela_leave_reason;
-  String? ela_address_while_on_leave;
-  String? ela_contact_no;
-  String? ela_load_adjusted;
-  String? ela_emergency_leave;
-  String? Approvedby;
+  int? id;
+  int? leaveStatus;
+  String? elaIsApproveValue;
+  int? elaEmpId;
+  String? elaEmpName;
+  dynamic? elaLeaveTypeId;
+  dynamic? leaveBalance;
+  String? elaFromDnt;
+  String? elaToDnt;
+  dynamic? elaDays;
+  String? elaReason;
+  int? elaLeaveReason;
+  String? elaAddressWhileOnLeave;
+  String? elaContactNo;
+  int? elaLoadAdjusted;
+  int? elaEmergencyLeave;
+  String? approvedby;
 
   LeaveDetail(
       {this.id,
-      this.Leave_Status,
-      this.ela_is_approve_value,
-      this.ela_emp_id,
-      this.ela_emp_name,
-      this.ela_leave_type_id,
-      this.leave_balance,
-      this.ela_from_dnt,
-      this.ela_to_dnt,
-      this.ela_days,
-      this.ela_reason,
-      this.ela_leave_reason,
-      this.ela_address_while_on_leave,
-      this.ela_contact_no,
-      this.ela_load_adjusted,
-      this.ela_emergency_leave,
-      this.Approvedby});
+        this.leaveStatus,
+        this.elaIsApproveValue,
+        this.elaEmpId,
+        this.elaEmpName,
+        this.elaLeaveTypeId,
+        this.leaveBalance,
+        this.elaFromDnt,
+        this.elaToDnt,
+        this.elaDays,
+        this.elaReason,
+        this.elaLeaveReason,
+        this.elaAddressWhileOnLeave,
+        this.elaContactNo,
+        this.elaLoadAdjusted,
+        this.elaEmergencyLeave,
+        this.approvedby});
 
-  LeaveDetail.fromJson(Map<String, dynamic> jsonData) {
-    id = jsonData['id'] ?? '';
-    Leave_Status = jsonData['Leave_Status'] ?? '';
-    ela_is_approve_value = jsonData['ela_is_approve_value'] ?? '';
-    ela_emp_id = jsonData['ela_emp_id'] ?? '';
-    ela_emp_name = jsonData['ela_emp_name'] ?? '';
-    ela_leave_type_id = jsonData['ela_leave_type_id'] ?? '';
-    leave_balance = jsonData['leave_balance'] ?? '';
-    ela_from_dnt = jsonData['ela_from_dnt'] ?? '';
-    ela_to_dnt = jsonData['ela_to_dnt'] ?? '';
-    ela_days = jsonData['ela_days'] ?? '';
-    ela_reason = jsonData['ela_reason'] ?? '';
-    ela_leave_reason = jsonData['ela_leave_reason'] ?? '';
-    ela_address_while_on_leave = jsonData['ela_address_while_on_leave'] ?? '';
-    ela_contact_no = jsonData['ela_contact_no'] ?? '';
-    ela_load_adjusted = jsonData['ela_load_adjusted'] ?? '';
-    ela_emergency_leave = jsonData['ela_emergency_leave'] ?? '';
-    Approvedby = jsonData['Approvedby'] ?? '';
+  LeaveDetail.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    leaveStatus = json['Leave_Status'];
+    elaIsApproveValue = json['ela_is_approve_value'];
+    elaEmpId = json['ela_emp_id'];
+    elaEmpName = json['ela_emp_name'];
+    elaLeaveTypeId = json['ela_leave_type_id'];
+    leaveBalance = json['leave_balance'];
+    elaFromDnt = json['ela_from_dnt'];
+    elaToDnt = json['ela_to_dnt'];
+    elaDays = json['ela_days'];
+    elaReason = json['ela_reason'];
+    elaLeaveReason = json['ela_leave_reason'];
+    elaAddressWhileOnLeave = json['ela_address_while_on_leave'];
+    elaContactNo = json['ela_contact_no'];
+    elaLoadAdjusted = json['ela_load_adjusted'];
+    elaEmergencyLeave = json['ela_emergency_leave'];
+    approvedby = json['Approvedby'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['Leave_Status'] = this.leaveStatus;
+    data['ela_is_approve_value'] = this.elaIsApproveValue;
+    data['ela_emp_id'] = this.elaEmpId;
+    data['ela_emp_name'] = this.elaEmpName;
+    data['ela_leave_type_id'] = this.elaLeaveTypeId;
+    data['leave_balance'] = this.leaveBalance;
+    data['ela_from_dnt'] = this.elaFromDnt;
+    data['ela_to_dnt'] = this.elaToDnt;
+    data['ela_days'] = this.elaDays;
+    data['ela_reason'] = this.elaReason;
+    data['ela_leave_reason'] = this.elaLeaveReason;
+    data['ela_address_while_on_leave'] = this.elaAddressWhileOnLeave;
+    data['ela_contact_no'] = this.elaContactNo;
+    data['ela_load_adjusted'] = this.elaLoadAdjusted;
+    data['ela_emergency_leave'] = this.elaEmergencyLeave;
+    data['Approvedby'] = this.approvedby;
+    return data;
   }
 }
