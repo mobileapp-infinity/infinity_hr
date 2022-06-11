@@ -92,9 +92,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   DateFormat dateFormat = DateFormat("dd/MM/yyyy ");
   RxBool _isNeedToShowUpdateDeleteButton = true.obs;
+ RxBool _enableAllFields=true.obs;
 
   @override
   void initState() {
+   // _isNeedToShowUpdateDeleteButton.value=widget._ISUPDATE;
     _dayCountController.text = "1.0";
     _fromDateController.text = "${dateFormat.format(DateTime.now())} 9:00 AM";
     _toDateController.text = "${dateFormat.format(DateTime.now())} 7:00 PM";
@@ -152,6 +154,15 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
           }
           setState(() {});
         });
+      }
+      if(widget._STATUS =="P" ||widget._STATUS ==""){
+        //widget._ISUPDATE = false;
+        //_enableAllFields.value=false;
+      }else{
+        //update delete button gone`
+        //can't update form
+        widget._ISUPDATE = false;
+         _enableAllFields.value=false;
       }
     }
 
@@ -447,7 +458,9 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                               )
                             : DropdownButton(
                                 value: _selectLeaveTypeDropDownPosition.value,
-                                onChanged: (position) {
+                                onChanged:
+                                _enableAllFields.value?
+                                    (position) {
                                   _selectLeaveTypeDropDownPosition.value =
                                       position as int;
                                   if (_selectLeaveTypeDropDownPosition.value >
@@ -461,7 +474,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
 
                                     //TODO API CALL For Leave Type Drop dow
                                   }
-                                },
+                                }:null,
                                 items: [
                                   ...getleavetypeandreasonandnotestatusone!
                                       .map(
@@ -582,11 +595,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           ),
                         ),
                         IconButton(
+                          disabledColor: Colors.grey,
                           icon: const Icon(
+
                             Icons.calendar_month_outlined,
                             color: CustomColor.colorPrimary,
                           ),
-                          onPressed: () {
+                          onPressed:_enableAllFields.value? () {
                             showDatePicker(
                                 context: context,
                                 initialDate: DateTime.now(),
@@ -640,7 +655,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 });
                               }
                             });
-                          },
+                          }:null,
                         ),
                       ],
                     ),
@@ -695,11 +710,12 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           ),
                         ),
                         IconButton(
+                          disabledColor: Colors.grey,
                           icon: const Icon(
                             Icons.calendar_month_outlined,
                             color: CustomColor.colorPrimary,
                           ),
-                          onPressed: () {
+                          onPressed: _enableAllFields.value?() {
                             if (kDebugMode) {
                               print("first date$firstDateOfToDate");
                             }
@@ -762,7 +778,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 });
                               }
                             });
-                          },
+                          }:null,
                         ),
                       ],
                     ),
@@ -833,10 +849,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                         textAlign: TextAlign.start,
-                      )),
+                      ),),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
+                      enabled: _enableAllFields.value,
                       cursorColor: CustomColor.colorPrimary,
                       controller: _remarkController,
                       decoration: const InputDecoration(
@@ -895,7 +912,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                               )
                             : DropdownButton(
                                 value: _selectLeaveReasonDropDownPosition.value,
-                                onChanged: (position) {
+                                onChanged:_enableAllFields.value? (position) {
                                   _selectLeaveReasonDropDownPosition.value =
                                       position as int;
                                   if (_selectLeaveReasonDropDownPosition.value >
@@ -907,7 +924,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                     //         .ebdValue!;
                                     //TODO API CALL For Leave Type Drop down
                                   }
-                                },
+                                }:null,
                                 items: [
                                   ...getleavetypeandreasonandnotestatustwo!
                                       .map(
@@ -956,6 +973,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     child: TextField(
                       maxLines: 3,
                       cursorColor: CustomColor.colorPrimary,
+                      enabled: _enableAllFields.value,
                       controller: _addressWhileOnLeaveController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -998,6 +1016,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
+                      enabled: _enableAllFields.value,
                       cursorColor: CustomColor.colorPrimary,
                       controller: _contactWhileOnLeaveController,
                       decoration: const InputDecoration(
@@ -1033,11 +1052,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 leading: Radio(
                     value: 1,
                     groupValue: groupValue,
-                    onChanged: (val) {
+                    onChanged:_enableAllFields.value? (val) {
                       setState(() {
                         groupValue = 1;
                       });
-                    }),
+                    }:null,)
               ),
             ), //radio 1
             Padding(
@@ -1048,11 +1067,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 leading: Radio(
                     value: 0,
                     groupValue: groupValue,
-                    onChanged: (val) {
+                    onChanged:_enableAllFields.value? (val) {
                       setState(() {
                         groupValue = 0;
                       });
-                    }),
+                    }:null),
               ),
             ), //radio 2
             Padding(
@@ -1063,11 +1082,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 leading: Radio(
                     value: 2,
                     groupValue: groupValue,
-                    onChanged: (val) {
+                    onChanged:_enableAllFields.value? (val) {
                       setState(() {
                         groupValue = 2;
                       });
-                    }),
+                    }:null),
               ),
             ), //radio 3
             ListTile(
@@ -1075,11 +1094,11 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               title: const Text('Apply For Emergency Leave'),
               leading: Checkbox(
                   value: _checkboxForEmergencyLeave,
-                  onChanged: (val) {
+                  onChanged: _enableAllFields.value?(val) {
                     setState(() {
                       _checkboxForEmergencyLeave = val!;
                     });
-                  }),
+                  }:null),
             ), //radio 3
             Padding(
               padding: const EdgeInsets.only(left: 20.0),
@@ -1100,8 +1119,8 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 ),
               ), //Note:-)
             ),
-            !widget._ISUPDATE
-                ? Row(
+            if(!widget._ISUPDATE &&  _enableAllFields.value)
+                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       SizedBox(
@@ -1187,8 +1206,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         ),
                       ), //Cancel
                     ],
-                  )
-                : const SizedBox(),
+                  ),
             SizedBox(
               height: deviceSize.height * 0.08,
             )
