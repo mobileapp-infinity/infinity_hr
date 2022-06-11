@@ -19,7 +19,7 @@ class _CommonAppBarState extends State<CommonAppBar> {
             Navigator.of(context).pop();
           },
           child: Image.asset("assets/images/ic_back_final.png",color: Colors.black,scale: 3.5,)),
-      title: Text(widget.title,style: TextStyle(color: Colors.black),),
+      title: Text(widget.title,style: const TextStyle(color: Colors.black),),
       elevation: 0,
     );
   }

@@ -11,11 +11,17 @@
   <component name="ChangeListManager">
     <list default="true" id="97e936ad-5c63-4618-9371-286ec1f69815" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/get_leave_detail_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/get_leave_detail_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_urls.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_urls.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screens/add_leave_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/add_leave_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/login_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/profile_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screens/view_leave_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/view_leave_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/utils/common_permission_util.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utils/common_permission_util.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/common_appbar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/common_appbar.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/widgets/drawer_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/drawer_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/widgets/leave_widgets/grid_widget_for_leave.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/leave_widgets/grid_widget_for_leave.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/miss_punch_widgets/grid_widget_for_miss_punch.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/miss_punch_widgets/grid_widget_for_miss_punch.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/miss_punch_widgets/last_in_out_for_miss_punch.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/miss_punch_widgets/last_in_out_for_miss_punch.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +72,7 @@
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
-    <property name="settings.editor.selected.configurable" value="emulator" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Java" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
   <component name="RecentsManager">
@@ -120,7 +126,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/login_screen.dart</url>
-          <line>258</line>
+          <line>257</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
@@ -160,32 +166,32 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/widgets/drawer_widget.dart</url>
-          <line>80</line>
+          <line>83</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1294</line>
+          <line>1361</line>
           <option name="timeStamp" value="65" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1295</line>
+          <line>1362</line>
           <option name="timeStamp" value="66" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1297</line>
+          <line>1364</line>
           <option name="timeStamp" value="67" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1299</line>
+          <line>1366</line>
           <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/screens/add_leave_screen.dart</url>
-          <line>1300</line>
+          <line>1367</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
       </breakpoints>

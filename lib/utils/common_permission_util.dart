@@ -48,7 +48,7 @@ class PermissionUtil {
       String base64String, String fileName) async {
     Uint8List bytes = base64.decode(base64String);
     String dir = (await getApplicationDocumentsDirectory()).path;
-    File file = new File('$dir/${fileName}');
+    File file =  File('$dir/$fileName');
     File fileNew = await file.writeAsBytes(bytes);
     String filePath = fileNew.path;
     try {

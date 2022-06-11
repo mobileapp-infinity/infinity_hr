@@ -31,7 +31,7 @@ class _LastInOutForMissPunchState extends State<LastInOutForMissPunch> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(
+                        const Text(
                           "Last In:-",
                           style: TextStyle(
                               fontSize: 17,
@@ -40,30 +40,30 @@ class _LastInOutForMissPunchState extends State<LastInOutForMissPunch> {
                         ),
                         Text(
                           widget.lastinoutmodel![0].lastIn!,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey),
                         )
                       ],
                     ),
-                    Divider(
+                    const Divider(
                       color: Colors.grey,
                       thickness: 2,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(
+                        const Text(
                           "Last Out:-",
-                          style: TextStyle(
+                          style:  TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey),
                         ),
                         Text(
                           widget.lastinoutmodel![0].lastOut!,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey),
@@ -75,11 +75,11 @@ class _LastInOutForMissPunchState extends State<LastInOutForMissPunch> {
               ),
             ),
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: CustomColor.colorPrimary,
               ),
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: Icon(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: const Icon(
                 Icons.arrow_forward_ios_outlined,
                 color: Colors.white,
                 size: 28.0,

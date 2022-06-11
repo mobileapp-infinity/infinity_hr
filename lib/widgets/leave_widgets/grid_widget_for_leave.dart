@@ -69,7 +69,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
         InkWell(
           onTap: () {
             widget.onDashboardMenuSelected(DashboardMenuEnum.leaveAddLeaves);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddLeaveScreen(id: "",isupdate: false,status: "",)));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddLeaveScreen(id: "",isUpdate: false,status: "",)));
           },
           child: Card(
             elevation: 5,

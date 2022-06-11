@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:infinity_hr/screens/profile_screen.dart';
 import 'package:infinity_hr/screens/splash_screen.dart';
-import 'package:infinity_hr/screens/view_leave_page.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

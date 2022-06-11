@@ -16,7 +16,6 @@ import 'package:infinity_hr/models/getleavetypeandreasonandnotestatusone.dart';
 import 'package:infinity_hr/models/getleavetypeandreasonandnotestatusthree.dart';
 import 'package:infinity_hr/models/getleavetypeandreasonandnotestatustwo.dart';
 import 'package:infinity_hr/models/insert_leave.dart';
-import 'package:infinity_hr/screens/view_leave_page.dart';
 import 'package:infinity_hr/utils/custom_colors.dart';
 import 'package:infinity_hr/widgets/common_appbar.dart';
 import 'package:infinity_hr/widgets/common_bottom_sheet.dart';
@@ -29,11 +28,11 @@ class AddLeaveScreen extends StatefulWidget {
     super.key,
     required id,
     required status,
-    required isupdate,
+    required isUpdate,
   }) {
-    this._ID = id;
-    this._STATUS = status;
-    this._ISUPDATE = isupdate;
+    _ID = id;
+    _STATUS = status;
+    _ISUPDATE = isUpdate;
   }
 
   String _ID = "", _STATUS = "";
@@ -46,8 +45,9 @@ class AddLeaveScreen extends StatefulWidget {
 class _AddLeaveScreenState extends State<AddLeaveScreen> {
   static const _redColor = CustomColor.colorPrimary;
 
-  RxBool _isLoadingForSubmit = false.obs;
-  RxBool _isLoadingForUpdate = false.obs;
+  final RxBool _isLoadingForSubmit = false.obs;
+  final RxBool _isLoadingForDelete = false.obs;
+  final RxBool _isLoadingForUpdate = false.obs;
   bool _checkboxForEmergencyLeave = false;
   int groupValue = -1;
   String _fullName = "";
@@ -62,7 +62,6 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   final TextEditingController _employeeNameController = TextEditingController();
   final TextEditingController _leaveBalanceController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
-
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _dayCountController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
@@ -91,12 +90,23 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   DateFormat dateFormat = DateFormat("dd/MM/yyyy ");
-  RxBool _isNeedToShowUpdateDeleteButton = true.obs;
- RxBool _enableAllFields=true.obs;
+  final RxBool _enableAllFields = true.obs;
+
+  @override
+  void dispose() {
+    _employeeNameController.clear();
+    _leaveBalanceController.clear();
+    _toDateController.clear();
+    _fromDateController.clear();
+    _dayCountController.clear();
+    _remarkController.clear();
+    _addressWhileOnLeaveController.clear();
+    super.dispose();
+  }
 
   @override
   void initState() {
-   // _isNeedToShowUpdateDeleteButton.value=widget._ISUPDATE;
+    // _isNeedToShowUpdateDeleteButton.value=widget._ISUPDATE;
     _dayCountController.text = "1.0";
     _fromDateController.text = "${dateFormat.format(DateTime.now())} 9:00 AM";
     _toDateController.text = "${dateFormat.format(DateTime.now())} 7:00 PM";
@@ -117,16 +127,16 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       if (widget._ISUPDATE) {
         editLeaveDataApiCall(widget._ID).then((value) {
           _remarkController.text = leaveDetail!.elaReason!;
-          getleavetypeandreasonandnotestatusone!.forEach((element) {
-            if(element.id== leaveDetail!.elaLeaveTypeId as int){
-              _selectLeaveTypeDropDownPosition.value=  element.position;
+          for (var element in getleavetypeandreasonandnotestatusone!) {
+            if (element.id == leaveDetail!.elaLeaveTypeId as int) {
+              _selectLeaveTypeDropDownPosition.value = element.position;
             }
-          });
-          getleavetypeandreasonandnotestatustwo!.forEach((element) {
-            if(element.ebdValue== leaveDetail!.elaLeaveReason as int){
-              _selectLeaveReasonDropDownPosition.value=  element.position;
+          }
+          for (var element in getleavetypeandreasonandnotestatustwo!) {
+            if (element.ebdValue == leaveDetail!.elaLeaveReason as int) {
+              _selectLeaveReasonDropDownPosition.value = element.position;
             }
-          });
+          }
 
           // _selectLeaveTypeDropDownPosition.value =
           // leaveDetail!.elaLeaveTypeId as int;
@@ -155,19 +165,16 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
           setState(() {});
         });
       }
-      if(widget._STATUS =="P" ||widget._STATUS ==""){
+      if (widget._STATUS == "P" || widget._STATUS == "") {
         //widget._ISUPDATE = false;
         //_enableAllFields.value=false;
-      }else{
+      } else {
         //update delete button gone`
         //can't update form
         widget._ISUPDATE = false;
-         _enableAllFields.value=false;
+        _enableAllFields.value = false;
       }
-    }
-
-    );
-
+    });
 
     super.initState();
   }
@@ -213,7 +220,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 ),
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               _isLoadingForUpdate.value = true;
                               if (_selectLeaveTypeDropDownPosition.value == 0) {
                                 _isLoadingForUpdate.value = false;
@@ -227,13 +234,14 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 _showToast(msg: "please enter remark");
                                 return;
                               } //enter remarks
-                              if (_selectLeaveReasonDropDownPosition.value == 0) {
+                              if (_selectLeaveReasonDropDownPosition.value ==
+                                  0) {
                                 _isLoadingForUpdate.value = false;
 
                                 _showToast(msg: "please select reason type");
                                 return;
                               }
-                              addLeaveApiCall();
+                              await addLeaveApiCall();
                               _isLoadingForUpdate.value = false;
                             },
                             child: Obx(
@@ -241,10 +249,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                   ? const SizedBox(
                                       height: 15,
                                       width: 15,
-                                      child: CircularProgressIndicator(),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                        color: Colors.white,
+                                      ),
                                     )
                                   : const Text(
-                                      "Update",
+                                      "update",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -255,119 +266,133 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           width: deviceSize.width * 0.40,
                           height: deviceSize.width * 0.10,
                           child: ElevatedButton(
-                              child: const Text(
-                                "Delete",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              style: ButtonStyle(
-                                elevation: MaterialStateProperty.all(0),
-                                side: MaterialStateProperty.all(
-                                  const BorderSide(
-                                    style: BorderStyle.solid,
-                                    color: Colors.black26,
-                                    width: 1.0,
-                                  ),
-                                ),
-                                foregroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.white),
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.black),
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
+                            style: ButtonStyle(
+                              elevation: MaterialStateProperty.all(0),
+                              side: MaterialStateProperty.all(
+                                const BorderSide(
+                                  style: BorderStyle.solid,
+                                  color: Colors.black26,
+                                  width: 1.0,
                                 ),
                               ),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (ctx) => AlertDialog(
-                                    // title: Text("Alert Dialog Box",style: TextStyle(backgroundColor: Colors.red)),
-                                    //actionsPadding: EdgeInsets.only(left: 10),
-                                    title: Container(
-                                      height: deviceSize.height * 0.05,
-                                      color: CustomColor.colorPrimary,
-                                      child: const Center(
-                                        child: Text(
-                                          "INFINITY",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              _isLoadingForDelete.value = true;
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  // title: Text("Alert Dialog Box",style: TextStyle(backgroundColor: Colors.red)),
+                                  //actionsPadding: EdgeInsets.only(left: 10),
+                                  title: Container(
+                                    height: deviceSize.height * 0.05,
+                                    color: _redColor,
+                                    child: const Center(
+                                      child: Text(
+                                        "INFINITY",
+                                        style: TextStyle(color: Colors.white),
                                       ),
                                     ),
-                                    // contentPadding: EdgeInsets.all(25),
-                                    content: const Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 20),
-                                        child: Text("Are You Sure To Delete?")),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        style: ButtonStyle(
-                                          side: MaterialStateProperty.all(
-                                            const BorderSide(
-                                              style: BorderStyle.solid,
-                                              color: CustomColor.colorPrimary,
-                                              width: 1.0,
-                                            ),
-                                          ),
-                                          foregroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  CustomColor.colorPrimary),
-                                          backgroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  Colors.white),
-                                          shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text(
-                                          "Cancel",
-                                          style: TextStyle(),
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        style: ButtonStyle(
-                                          foregroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  Colors.white),
-                                          backgroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  _redColor),
-                                          shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          deleteLeaveApiCall(widget._ID)
-                                              .then((value) =>
-                                                  _showToast(msg: value))
-                                              .then((value) =>
-                                                  Navigator.of(context)
-                                                      .popUntil((route) =>
-                                                          route.isFirst));
-                                        },
-                                        child: const Text(
-                                          "OK",
-                                          style: TextStyle(),
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                );
-                              }),
+                                  // contentPadding: EdgeInsets.all(25),
+                                  content: const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 20),
+                                      child: Text("Are You Sure To Delete?")),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                        side: MaterialStateProperty.all(
+                                          const BorderSide(
+                                            style: BorderStyle.solid,
+                                            color: _redColor,
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        foregroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                _redColor),
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.white),
+                                        shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        _isLoadingForDelete.value = false;
+                                      },
+                                      child: const Text(
+                                        "Cancel",
+                                        style: TextStyle(),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.white),
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                _redColor),
+                                        shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        deleteLeaveApiCall(widget._ID)
+                                            .then((value) =>
+                                                _showToast(msg: value))
+                                            .then((value) =>
+                                                Navigator.of(context).popUntil(
+                                                    (route) => route.isFirst));
+                                        _isLoadingForDelete.value = false;
+                                      },
+                                      child: const Text(
+                                        "OK",
+                                        style: TextStyle(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: Obx(
+                              () => _isLoadingForDelete.value
+                                  ? const SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Delete",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -398,7 +423,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25),
                     child: TextField(
                       enabled: false,
-                      cursorColor: CustomColor.colorPrimary,
+                      cursorColor: _redColor,
                       controller: _employeeNameController,
                       decoration: const InputDecoration(
                         hintText: "Employee Name",
@@ -450,31 +475,37 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 10),
-                                  child: Text(
-                                    "Loading...",
-                                    textAlign: TextAlign.center,
-                                  ),
+                                  child:LinearProgressIndicator(
+                                    backgroundColor: Colors.grey,
+                                    valueColor:  AlwaysStoppedAnimation<Color>(Colors.black54),
+                                  )
+                                  // Text(
+                                  //   "Loading...",
+                                  //   textAlign: TextAlign.center,
+                                  // ),
                                 ),
                               )
                             : DropdownButton(
                                 value: _selectLeaveTypeDropDownPosition.value,
-                                onChanged:
-                                _enableAllFields.value?
-                                    (position) {
-                                  _selectLeaveTypeDropDownPosition.value =
-                                      position as int;
-                                  if (_selectLeaveTypeDropDownPosition.value >
-                                      0) {
-                                    selectedLeaveTypeId =
-                                        getleavetypeandreasonandnotestatusone![
-                                                _selectLeaveTypeDropDownPosition
-                                                    .value]
-                                            .id!;
-                                    calculateLeaveBalance(selectedLeaveTypeId);
+                                onChanged: _enableAllFields.value
+                                    ? (position) {
+                                        _selectLeaveTypeDropDownPosition.value =
+                                            position as int;
+                                        if (_selectLeaveTypeDropDownPosition
+                                                .value >
+                                            0) {
+                                          selectedLeaveTypeId =
+                                              getleavetypeandreasonandnotestatusone![
+                                                      _selectLeaveTypeDropDownPosition
+                                                          .value]
+                                                  .id!;
+                                          calculateLeaveBalance(
+                                              selectedLeaveTypeId);
 
-                                    //TODO API CALL For Leave Type Drop dow
-                                  }
-                                }:null,
+                                          //TODO API CALL For Leave Type Drop dow
+                                        }
+                                      }
+                                    : null,
                                 items: [
                                   ...getleavetypeandreasonandnotestatusone!
                                       .map(
@@ -520,7 +551,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       enabled: false,
-                      cursorColor: CustomColor.colorPrimary,
+                      cursorColor: _redColor,
                       controller: _leaveBalanceController,
                       decoration: const InputDecoration(
                         hintText: "Enter Balance Leave",
@@ -575,7 +606,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                             //       lastDate: DateTime(2100));
                             // },
                             focusNode: FocusNode(canRequestFocus: false),
-                            cursorColor: CustomColor.colorPrimary,
+                            cursorColor: _redColor,
                             controller: _fromDateController,
                             decoration: InputDecoration(
                               hintText:
@@ -597,65 +628,68 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         IconButton(
                           disabledColor: Colors.grey,
                           icon: const Icon(
-
                             Icons.calendar_month_outlined,
-                            color: CustomColor.colorPrimary,
+                            color: _redColor,
                           ),
-                          onPressed:_enableAllFields.value? () {
-                            showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime(2100),
-                                builder: (context, picker) {
-                                  return Theme(
-                                    //TODO: change colors
-                                    data: ThemeData.dark().copyWith(
-                                      colorScheme: const ColorScheme.light(
-                                        primary: CustomColor.colorPrimary,
-                                        onPrimary: Colors.white,
-                                        surface: CustomColor.colorPrimary,
-                                        //
-                                      ),
-                                      dialogBackgroundColor: Colors.white,
-                                    ),
-                                    child: picker!,
-                                  );
-                                }).then((selectedDate) {
-                              //TODO: handle selected date
-                              if (selectedDate != null) {
-                                firstDateOfToDate = selectedDate;
-                                if (kDebugMode) {
-                                  print(selectedDate);
-                                }
-                                var sdate = dateFormat.format(selectedDate);
-                                dateForFromDate = sdate.toString();
-                              } else {
-                                return;
-                              }
-                            }).then((_) {
-                              if (dateForFromDate != "") {
-                                showTimePicker(
-                                    context: context,
-                                    initialTime: const TimeOfDay(
-                                      hour: 09,
-                                      minute: 00,
-                                    )).then((selectedTime) {
-                                  if (selectedTime != null) {
-                                    if (kDebugMode) {
-                                      print(selectedTime.format(context));
+                          onPressed: _enableAllFields.value
+                              ? () {
+                                  showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(1900),
+                                      lastDate: DateTime(2100),
+                                      builder: (context, picker) {
+                                        return Theme(
+                                          //TODO: change colors
+                                          data: ThemeData.dark().copyWith(
+                                            colorScheme:
+                                                const ColorScheme.light(
+                                              primary: _redColor,
+                                              onPrimary: Colors.white,
+                                              surface: _redColor,
+                                              //
+                                            ),
+                                            dialogBackgroundColor: Colors.white,
+                                          ),
+                                          child: picker!,
+                                        );
+                                      }).then((selectedDate) {
+                                    //TODO: handle selected date
+                                    if (selectedDate != null) {
+                                      firstDateOfToDate = selectedDate;
+                                      if (kDebugMode) {
+                                        print(selectedDate);
+                                      }
+                                      var sdate =
+                                          dateFormat.format(selectedDate);
+                                      dateForFromDate = sdate.toString();
+                                    } else {
+                                      return;
                                     }
-                                    timeForFromDate =
-                                        selectedTime.format(context);
-                                    _fromDateController.text =
-                                        "$dateForFromDate $timeForFromDate";
-                                  } else {
-                                    return;
-                                  }
-                                });
-                              }
-                            });
-                          }:null,
+                                  }).then((_) {
+                                    if (dateForFromDate != "") {
+                                      showTimePicker(
+                                          context: context,
+                                          initialTime: const TimeOfDay(
+                                            hour: 09,
+                                            minute: 00,
+                                          )).then((selectedTime) {
+                                        if (selectedTime != null) {
+                                          if (kDebugMode) {
+                                            print(selectedTime.format(context));
+                                          }
+                                          timeForFromDate =
+                                              selectedTime.format(context);
+                                          _fromDateController.text =
+                                              "$dateForFromDate $timeForFromDate";
+                                        } else {
+                                          return;
+                                        }
+                                      });
+                                    }
+                                  });
+                                }
+                              : null,
                         ),
                       ],
                     ),
@@ -690,7 +724,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                         Expanded(
                           child: TextField(
                             enabled: false,
-                            cursorColor: CustomColor.colorPrimary,
+                            cursorColor: _redColor,
                             controller: _toDateController,
                             decoration: InputDecoration(
                               hintText:
@@ -713,72 +747,76 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                           disabledColor: Colors.grey,
                           icon: const Icon(
                             Icons.calendar_month_outlined,
-                            color: CustomColor.colorPrimary,
+                            color: _redColor,
                           ),
-                          onPressed: _enableAllFields.value?() {
-                            if (kDebugMode) {
-                              print("first date$firstDateOfToDate");
-                            }
-                            if (kDebugMode) {
-                              print("init date${DateTime.now()}");
-                            }
-                            showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime(2100),
-                                builder: (context, picker) {
-                                  return Theme(
-                                    //
-                                    //TODO: change colors
-                                    data: ThemeData.dark().copyWith(
-                                      colorScheme: const ColorScheme.light(
-                                        primary: CustomColor.colorPrimary,
-                                        onPrimary: Colors.white,
-                                        surface: CustomColor.colorPrimary,
-                                        //
-                                      ),
-                                      dialogBackgroundColor: Colors.white,
-                                    ),
-                                    child: picker!,
-                                  );
-                                }).then((selectedDate) {
-                              //TODO: handle selected date
-                              if (selectedDate != null) {
-                                if (kDebugMode) {
-                                  print(selectedDate);
-                                }
-                                var sdate = dateFormat.format(selectedDate);
-                                dateForToDate = sdate.toString();
-                              } else {
-                                return;
-                              }
-                            }).then((_) {
-                              if (dateForToDate != "") {
-                                showTimePicker(
-                                    context: context,
-                                    initialTime: const TimeOfDay(
-                                      hour: 19,
-                                      minute: 00,
-                                    )).then((selectedTime) {
-                                  if (selectedTime != null) {
-                                    if (kDebugMode) {
-                                      print(selectedTime.format(context));
-                                    }
-                                    timeForToDate =
-                                        selectedTime.format(context);
-                                    _toDateController.text =
-                                        "$dateForToDate $timeForToDate";
-
-                                    calculateLeaveDaysApiCall(
-                                        dateForFromDate, dateForToDate);
-                                  } else {
-                                    return;
+                          onPressed: _enableAllFields.value
+                              ? () {
+                                  if (kDebugMode) {
+                                    print("first date$firstDateOfToDate");
                                   }
-                                });
-                              }
-                            });
-                          }:null,
+                                  if (kDebugMode) {
+                                    print("init date${DateTime.now()}");
+                                  }
+                                  showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(1900),
+                                      lastDate: DateTime(2100),
+                                      builder: (context, picker) {
+                                        return Theme(
+                                          //
+                                          //TODO: change colors
+                                          data: ThemeData.dark().copyWith(
+                                            colorScheme:
+                                                const ColorScheme.light(
+                                              primary: _redColor,
+                                              onPrimary: Colors.white,
+                                              surface: _redColor,
+                                              //
+                                            ),
+                                            dialogBackgroundColor: Colors.white,
+                                          ),
+                                          child: picker!,
+                                        );
+                                      }).then((selectedDate) {
+                                    //TODO: handle selected date
+                                    if (selectedDate != null) {
+                                      if (kDebugMode) {
+                                        print(selectedDate);
+                                      }
+                                      var sdate =
+                                          dateFormat.format(selectedDate);
+                                      dateForToDate = sdate.toString();
+                                    } else {
+                                      return;
+                                    }
+                                  }).then((_) {
+                                    if (dateForToDate != "") {
+                                      showTimePicker(
+                                          context: context,
+                                          initialTime: const TimeOfDay(
+                                            hour: 19,
+                                            minute: 00,
+                                          )).then((selectedTime) {
+                                        if (selectedTime != null) {
+                                          if (kDebugMode) {
+                                            print(selectedTime.format(context));
+                                          }
+                                          timeForToDate =
+                                              selectedTime.format(context);
+                                          _toDateController.text =
+                                              "$dateForToDate $timeForToDate";
+
+                                          calculateLeaveDaysApiCall(
+                                              dateForFromDate, dateForToDate);
+                                        } else {
+                                          return;
+                                        }
+                                      });
+                                    }
+                                  });
+                                }
+                              : null,
                         ),
                       ],
                     ),
@@ -810,7 +848,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       enabled: false,
-                      cursorColor: CustomColor.colorPrimary,
+                      cursorColor: _redColor,
                       controller: _dayCountController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -841,21 +879,22 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                      padding: EdgeInsets.only(
-                          left: deviceSize.width * 0.06,
-                          top: deviceSize.height * 0.010),
-                      child: const Text(
-                        "Remarks",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                        textAlign: TextAlign.start,
-                      ),),
+                    padding: EdgeInsets.only(
+                        left: deviceSize.width * 0.06,
+                        top: deviceSize.height * 0.010),
+                    child: const Text(
+                      "Remarks",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       enabled: _enableAllFields.value,
-                      cursorColor: CustomColor.colorPrimary,
                       controller: _remarkController,
+                      cursorColor: _redColor,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "Enter Remark",
@@ -904,27 +943,30 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 10),
-                                  child: Text(
-                                    "Loading...",
-                                    textAlign: TextAlign.center,
-                                  ),
+                                  child:LinearProgressIndicator(
+                                    backgroundColor: Colors.grey,
+                                    valueColor:  AlwaysStoppedAnimation<Color>(Colors.black54),
+                                  )
                                 ),
                               )
                             : DropdownButton(
                                 value: _selectLeaveReasonDropDownPosition.value,
-                                onChanged:_enableAllFields.value? (position) {
-                                  _selectLeaveReasonDropDownPosition.value =
-                                      position as int;
-                                  if (_selectLeaveReasonDropDownPosition.value >
-                                      0) {
-                                    // int selectedLeaveTypeId =
-                                    //     getleavetypeandreasonandnotestatustwo![
-                                    //             _selectLeaveReasonDropDownPosition
-                                    //                 .value]
-                                    //         .ebdValue!;
-                                    //TODO API CALL For Leave Type Drop down
-                                  }
-                                }:null,
+                                onChanged: _enableAllFields.value
+                                    ? (position) {
+                                        _selectLeaveReasonDropDownPosition
+                                            .value = position as int;
+                                        if (_selectLeaveReasonDropDownPosition
+                                                .value >
+                                            0) {
+                                          // int selectedLeaveTypeId =
+                                          //     getleavetypeandreasonandnotestatustwo![
+                                          //             _selectLeaveReasonDropDownPosition
+                                          //                 .value]
+                                          //         .ebdValue!;
+                                          //TODO API CALL For Leave Type Drop down
+                                        }
+                                      }
+                                    : null,
                                 items: [
                                   ...getleavetypeandreasonandnotestatustwo!
                                       .map(
@@ -972,7 +1014,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       maxLines: 3,
-                      cursorColor: CustomColor.colorPrimary,
+                      cursorColor: _redColor,
                       enabled: _enableAllFields.value,
                       controller: _addressWhileOnLeaveController,
                       decoration: const InputDecoration(
@@ -1017,7 +1059,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                     padding: const EdgeInsets.only(left: 25, top: 3),
                     child: TextField(
                       enabled: _enableAllFields.value,
-                      cursorColor: CustomColor.colorPrimary,
+                      cursorColor: _redColor,
                       controller: _contactWhileOnLeaveController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -1047,17 +1089,19 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             Padding(
               padding: EdgeInsets.only(left: deviceSize.width * 0.4),
               child: ListTile(
-                visualDensity: const VisualDensity(vertical: -3),
-                title: const Text('Yes'),
-                leading: Radio(
+                  visualDensity: const VisualDensity(vertical: -3),
+                  title: const Text('Yes'),
+                  leading: Radio(
                     value: 1,
                     groupValue: groupValue,
-                    onChanged:_enableAllFields.value? (val) {
-                      setState(() {
-                        groupValue = 1;
-                      });
-                    }:null,)
-              ),
+                    onChanged: _enableAllFields.value
+                        ? (val) {
+                            setState(() {
+                              groupValue = 1;
+                            });
+                          }
+                        : null,
+                  )),
             ), //radio 1
             Padding(
               padding: EdgeInsets.only(left: deviceSize.width * 0.4),
@@ -1067,11 +1111,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 leading: Radio(
                     value: 0,
                     groupValue: groupValue,
-                    onChanged:_enableAllFields.value? (val) {
-                      setState(() {
-                        groupValue = 0;
-                      });
-                    }:null),
+                    onChanged: _enableAllFields.value
+                        ? (val) {
+                            setState(() {
+                              groupValue = 0;
+                            });
+                          }
+                        : null),
               ),
             ), //radio 2
             Padding(
@@ -1082,11 +1128,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 leading: Radio(
                     value: 2,
                     groupValue: groupValue,
-                    onChanged:_enableAllFields.value? (val) {
-                      setState(() {
-                        groupValue = 2;
-                      });
-                    }:null),
+                    onChanged: _enableAllFields.value
+                        ? (val) {
+                            setState(() {
+                              groupValue = 2;
+                            });
+                          }
+                        : null),
               ),
             ), //radio 3
             ListTile(
@@ -1094,11 +1142,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               title: const Text('Apply For Emergency Leave'),
               leading: Checkbox(
                   value: _checkboxForEmergencyLeave,
-                  onChanged: _enableAllFields.value?(val) {
-                    setState(() {
-                      _checkboxForEmergencyLeave = val!;
-                    });
-                  }:null),
+                  onChanged: _enableAllFields.value
+                      ? (val) {
+                          setState(() {
+                            _checkboxForEmergencyLeave = val!;
+                          });
+                        }
+                      : null),
             ), //radio 3
             Padding(
               padding: const EdgeInsets.only(left: 20.0),
@@ -1108,6 +1158,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   child: Obx(
                     () => _isLeaveTypeLoading.value
                         ? const CircularProgressIndicator(
+                      strokeWidth: 2.0,
                             color: Colors.white,
                           )
                         : Text(
@@ -1119,94 +1170,98 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                 ),
               ), //Note:-)
             ),
-            if(!widget._ISUPDATE &&  _enableAllFields.value)
-                 Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      SizedBox(
-                        width: deviceSize.width * 0.40,
-                        height: deviceSize.width * 0.10,
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(_redColor),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          onPressed: () {
-                            _isLoadingForSubmit.value = true;
-                            if (_selectLeaveTypeDropDownPosition.value == 0) {
-                              _isLoadingForSubmit.value = false;
-
-                              _showToast(msg: "please select leave type");
-                              return;
-                            } //select leave type
-                            if (_remarkController.text.isEmpty) {
-                              _isLoadingForSubmit.value = false;
-
-                              _showToast(msg: "please enter remark");
-                              return;
-                            } //enter remarks
-                            if (_selectLeaveReasonDropDownPosition.value == 0) {
-                              _isLoadingForSubmit.value = false;
-
-                              _showToast(msg: "please select reason type");
-                              return;
-                            }
-                            addLeaveApiCall();
-                            _isLoadingForSubmit.value = false;
-                          },
-                          child: Obx(
-                            () => _isLoadingForSubmit.value
-                                ? const SizedBox(
-                                    height: 15,
-                                    width: 15,
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : const Text(
-                                    "Submit",
-                                  ),
+            if (!widget._ISUPDATE && _enableAllFields.value)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                    width: deviceSize.width * 0.40,
+                    height: deviceSize.width * 0.10,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(_redColor),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                      ), //Submit
-                      SizedBox(
-                        width: deviceSize.width * 0.40,
-                        height: deviceSize.width * 0.10,
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            elevation: MaterialStateProperty.all(0),
-                            side: MaterialStateProperty.all(
-                              const BorderSide(
-                                style: BorderStyle.solid,
-                                color: Colors.black26,
-                                width: 1.0,
+                      ),
+                      onPressed: () async {
+                        _isLoadingForSubmit.value = true;
+                        setState(() {});
+                        if (_selectLeaveTypeDropDownPosition.value == 0) {
+                          _isLoadingForSubmit.value = false;
+
+                          _showToast(msg: "please select leave type");
+                          return;
+                        } //select leave type
+                        if (_remarkController.text.isEmpty) {
+                          _isLoadingForSubmit.value = false;
+
+                          _showToast(msg: "please enter remark");
+                          return;
+                        } //enter remarks
+                        if (_selectLeaveReasonDropDownPosition.value == 0) {
+                          _isLoadingForSubmit.value = false;
+
+                          _showToast(msg: "please select reason type");
+                          return;
+                        }
+                        await addLeaveApiCall();
+                        _isLoadingForSubmit.value = false;
+                      },
+                      child: Obx(
+                        () => _isLoadingForSubmit.value
+                            ? const SizedBox(
+                                height: 15,
+                                width: 15,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                "Submit",
                               ),
-                            ),
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(_redColor),
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
+                      ),
+                    ),
+                  ), //Submit
+                  SizedBox(
+                    width: deviceSize.width * 0.40,
+                    height: deviceSize.width * 0.10,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all(0),
+                        side: MaterialStateProperty.all(
+                          const BorderSide(
+                            style: BorderStyle.solid,
+                            color: Colors.black26,
+                            width: 1.0,
                           ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Cancel"),
                         ),
-                      ), //Cancel
-                    ],
-                  ),
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(_redColor),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Cancel"),
+                    ),
+                  ), //Cancel
+                ],
+              ),
             SizedBox(
               height: deviceSize.height * 0.08,
             )
@@ -1355,6 +1410,14 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
       } else {
         leaveId = '0';
       }
+      String loadAdjust = "0";
+      if (groupValue == 1) {
+        loadAdjust = "1";
+      } else if (groupValue == 2) {
+        loadAdjust = "2";
+      } else {
+        loadAdjust = "0";
+      }
 
       final response = await http.get(Uri.parse(
           //"&leave_id=" + leave_IDD + "&emp_id=" + mySharedPrefereces.getEmpID() + "&leave_type=" + leave_ID +
@@ -1368,7 +1431,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
 
           //empid,user id find from sharedpreference,ip address=1,
 
-          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=$leaveId&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}'));
+          '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=$leaveId&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=$loadAdjust&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}'));
       print(
           '${ApiUrls.baseUrl}Employee_leave_application_insert?&leave_id=$leaveId&emp_id=$_empId&leave_type=${selectedLeaveTypeId.toString()}&from_date=${_fromDateController.text}&to_date=${_toDateController.text}&remark=${_remarkController.text}&reason=${_selectLeaveReasonDropDownPosition.value}&load_adjusted=1&address_while_on_leave=${_addressWhileOnLeaveController.text}&contact_no=${_contactWhileOnLeaveController.text}&leave_days=${_dayCountController.text}&emergency_leave=$isEmergency&user_id=$_userId&ip_address=1&leave_balance=${_leaveBalanceController.text}');
       if (response.statusCode == 200) {
@@ -1431,7 +1494,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
             .first;
       }
       if (response.statusCode == 200) {
-        _showToast(msg: leaveDetail!.elaReason.toString());
+        // _showToast(msg: leaveDetail!.elaReason.toString());
       } else {
         _showToast(msg: 'something Went Wrong please try again later');
       }

@@ -4,13 +4,14 @@ import 'package:infinity_hr/screens/dashboard_screen.dart';
 class GridViewForMissPunch extends StatefulWidget {
   late DashboardMenuEnum dashboardMenuEnum;
   late Function onDashboardMenuSelected;
+
   GridViewForMissPunch({
     super.key,
     required DashboardMenuEnum dashboardMenuEnumParam,
     required Function onDashboardMenuSelected,
   }) {
-    this.dashboardMenuEnum = dashboardMenuEnumParam;
-    this.onDashboardMenuSelected = onDashboardMenuSelected;
+    dashboardMenuEnum = dashboardMenuEnumParam;
+    onDashboardMenuSelected = onDashboardMenuSelected;
   }
 
   @override

@@ -30,7 +30,7 @@ String empName = "";
             child: Padding(
               padding: const EdgeInsets.only(left: 10),
               child: Text(
-                  "Employee Code: ${empName}",
+                  "Employee Code: $empName",
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
               ),
@@ -61,5 +61,6 @@ String empName = "";
         setState((){});
       },
     );
+    super.initState();
   }
 }

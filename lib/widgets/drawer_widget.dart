@@ -3,6 +3,7 @@ import 'package:infinity_hr/screens/add_leave_screen.dart';
 import 'package:infinity_hr/screens/change_password_screen.dart';
 import 'package:infinity_hr/screens/dashboard_screen.dart';
 import 'package:infinity_hr/screens/login_screen.dart';
+import 'package:infinity_hr/screens/profile_screen.dart';
 import 'package:infinity_hr/screens/view_leave_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +63,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               onTap: () {
                 widget.onDrawerMenuSelected(DrawerMenuEnum.myProfile);
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProfileScreen()));
+
               },
             ),
           ),
@@ -122,7 +125,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               onTap: () {
                 widget.onDrawerMenuSelected(DrawerMenuEnum.addLeave);
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddLeaveScreen(id: "",isupdate: false,status: "",)));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddLeaveScreen(id: "",isUpdate: false,status: "",)));
 
               },
             ),
