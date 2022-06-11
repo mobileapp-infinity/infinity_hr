@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:infinity_hr/screens/profile_screen.dart';
 import 'package:infinity_hr/screens/splash_screen.dart';
 import 'package:infinity_hr/screens/view_leave_page.dart';
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
       ),
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+      home: const ProfileScreen(),
     );
   }
 }
