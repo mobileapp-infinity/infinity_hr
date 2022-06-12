@@ -49,8 +49,8 @@ dependencies:
   get: any
   cached_network_image: any
   flutter_web_browser: any
-  firebase_messaging: any
-  firebase_core: any
+  # firebase_messaging: any
+  # firebase_core: any
   font_awesome_flutter: any
   http: any
   pin_code_text_field: any

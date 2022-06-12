@@ -473,17 +473,18 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                             ? const Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                  child:LinearProgressIndicator(
-                                    backgroundColor: Colors.grey,
-                                    valueColor:  AlwaysStoppedAnimation<Color>(Colors.black54),
-                                  )
-                                  // Text(
-                                  //   "Loading...",
-                                  //   textAlign: TextAlign.center,
-                                  // ),
-                                ),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 10),
+                                    child: LinearProgressIndicator(
+                                      backgroundColor: Colors.grey,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.black54),
+                                    )
+                                    // Text(
+                                    //   "Loading...",
+                                    //   textAlign: TextAlign.center,
+                                    // ),
+                                    ),
                               )
                             : DropdownButton(
                                 value: _selectLeaveTypeDropDownPosition.value,
@@ -514,7 +515,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                           child: Text(
                                             '${e.ltmLeaveName}',
                                             style: const TextStyle(
-                                              fontSize: 13.0,
+                                              fontSize: 16.0,
                                             ),
                                           ),
                                         ),
@@ -941,13 +942,13 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                             ? const Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                  child:LinearProgressIndicator(
-                                    backgroundColor: Colors.grey,
-                                    valueColor:  AlwaysStoppedAnimation<Color>(Colors.black54),
-                                  )
-                                ),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 10),
+                                    child: LinearProgressIndicator(
+                                      backgroundColor: Colors.grey,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.black54),
+                                    )),
                               )
                             : DropdownButton(
                                 value: _selectLeaveReasonDropDownPosition.value,
@@ -975,7 +976,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                                           child: Text(
                                             '${e.ebdName}',
                                             style: const TextStyle(
-                                              fontSize: 13.0,
+                                              fontSize: 16.0,
                                             ),
                                           ),
                                         ),
@@ -1045,6 +1046,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  
                   Padding(
                       padding: EdgeInsets.only(
                           left: deviceSize.width * 0.06,
@@ -1158,7 +1160,7 @@ class _AddLeaveScreenState extends State<AddLeaveScreen> {
                   child: Obx(
                     () => _isLeaveTypeLoading.value
                         ? const CircularProgressIndicator(
-                      strokeWidth: 2.0,
+                            strokeWidth: 2.0,
                             color: Colors.white,
                           )
                         : Text(
