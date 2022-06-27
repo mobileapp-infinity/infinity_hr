@@ -22,7 +22,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _empDesignation = "";
   SharedPreferences? sharedPreferences;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  late final RxBool _isLoading = true.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Wrap(
                 alignment: WrapAlignment.center,
                 children: [
-                  Container(
+                  SizedBox(
                     height: deviceSize.height * 0.20,
                     child: Card(
                       elevation: 10,
@@ -100,16 +99,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 5),
                               leading: Image.asset(
                                 'assets/images/user_profile.png',
                                 height: 40.0,
                                 width: 40.0,
                               ),
-                              title: Text('Employee Code'),
+                              title: const Text('Employee Code'),
                               subtitle: _empId == "null"
-                                  ? Text("-")
+                                  ? const Text("-")
                                   : Text(_empId.toString()),
                             ),
                           ),
@@ -121,16 +120,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 5),
                               leading: Image.asset(
                                 'assets/images/user_profile.png',
                                 height: 40.0,
                                 width: 40.0,
                               ),
-                              title: Text('Employee Name'),
+                              title: const Text('Employee Name'),
                               subtitle: _empName == "null"
-                                  ? Text("-")
+                                  ? const Text("-")
                                   : Text(_empName.toString()),
                             ),
                           ),
@@ -142,16 +141,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 5),
                               leading: Image.asset(
                                 'assets/images/reporting.png',
                                 height: 40.0,
                                 width: 40.0,
                               ),
-                              title: Text('Reporting To'),
+                              title: const Text('Reporting To'),
                               subtitle: _empReportingTo == "null"
-                                  ? Text("-")
+                                  ? const Text("-")
                                   : Text(_empReportingTo.toString()),
                             ),
                           ),
@@ -163,16 +162,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 5),
                               leading: Image.asset(
                                 'assets/images/branch.png',
                                 height: 40.0,
                                 width: 40.0,
                               ),
-                              title: Text('Branch'),
+                              title: const Text('Branch'),
                               subtitle: _empBranch == "null"
-                                  ? Text("-")
+                                  ? const Text("-")
                                   : Text(_empBranch.toString()),
                             ),
                           ),
@@ -184,16 +183,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 5),
                               leading: Image.asset(
                                 'assets/images/dept.png',
                                 height: 40.0,
                                 width: 40.0,
                               ),
-                              title: Text('Department'),
+                              title: const Text('Department'),
                               subtitle: _empDepartment == "null"
-                                  ? Text("-")
+                                  ? const Text("-")
                                   : Text(_empDepartment.toString()),
                             ),
                           ),
@@ -205,16 +204,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 5),
                               leading: Image.asset(
                                 'assets/images/designation.png',
                                 height: 40.0,
                                 width: 40.0,
                               ),
-                              title: Text('Designation'),
+                              title: const Text('Designation'),
                               subtitle: _empDesignation == "null"
-                                  ? Text("-")
+                                  ? const Text("-")
                                   : Text(_empDesignation.toString()),
                             ),
                           ),

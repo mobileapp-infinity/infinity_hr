@@ -1,4 +1,4 @@
 class CommonStrings{
-    static final String APP_NAME = "CHILDREN'S UNIVERSIT";
+    static const String APP_NAME = "CHILDREN'S UNIVERSITY";
 
 }

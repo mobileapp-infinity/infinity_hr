@@ -33,7 +33,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
           mainAxisSpacing: 20),
       padding: const EdgeInsets.all(20),
       children: [
-        InkWell(
+        GestureDetector(
           onTap: () {
             widget.onDashboardMenuSelected(DashboardMenuEnum.leaveViewLeaves);
             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ViewLeaveScreen()));
@@ -66,7 +66,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
             ),
           ),
         ),
-        InkWell(
+        GestureDetector(
           onTap: () {
             widget.onDashboardMenuSelected(DashboardMenuEnum.leaveAddLeaves);
             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddLeaveScreen(id: "",isUpdate: false,status: "",)));
@@ -98,7 +98,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
             ),
           ),
         ),
-        InkWell(
+        GestureDetector(
           onTap: () {
             widget.onDashboardMenuSelected(DashboardMenuEnum.leaveLeaveBalance);
           },
@@ -130,7 +130,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
             ),
           ),
         ),
-        InkWell(
+        GestureDetector(
           onTap: () {
             widget.onDashboardMenuSelected(
                 DashboardMenuEnum.leaveViewCancelLeaves);
@@ -163,7 +163,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
             ),
           ),
         ),
-        InkWell(
+        GestureDetector(
           onTap: () {
             widget
                 .onDashboardMenuSelected(DashboardMenuEnum.leaveLeaveApproval);
@@ -196,7 +196,7 @@ class _GridViewForLeaveState extends State<GridViewForLeave> {
             ),
           ),
         ),
-        InkWell(
+        GestureDetector(
           onTap: () {
             widget.onDashboardMenuSelected(
                 DashboardMenuEnum.leaveCancelLeaveApproval);
